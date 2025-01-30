@@ -11,6 +11,22 @@ if (navColor == "#994700") {
     localStorage.setItem('darkMode', "true");
 }
 
+fetch('GOOGLE_API_KEY.txt')
+    .then(response => response.text())
+    .then(apiKey => {
+        if (!apiKey.trim()) {
+            document.querySelector('.missing-api-key-error').hidden = false;
+        } else {
+            document.querySelector('.missing-api-key-error').hidden = true;
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching the API key:', error);
+        document.querySelector('.missing-api-key-error').hidden = false;
+    });
+
+// ...existing code...
+
 if (localStorage.getItem('darkMode') == "true") {
     document.querySelector('.attach-file-img').src = './resources/attachFileDark.png';
 } else if (localStorage.getItem('darkMode') == "false") {
