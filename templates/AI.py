@@ -6,7 +6,7 @@ from langchain.chains import ConversationChain
 import tqdm
 
 llm = ChatGoogleGenerativeAI(
-    api_key=open('GOOGLE_API_KEY'),
+    api_key=open('GOOGLE_API_KEY.txt').read().strip(),
     model="gemini-1.5-flash",
     temperature=0.7
 )
@@ -18,9 +18,9 @@ converstaion_chain = ConversationChain(
     memory=memory
 )
 
-def AI(prompt) :
+def AI(prompt: str) :
     if prompt == 'delete chat':
         memory.clear()
     else:
         response = converstaion_chain.invoke({"input": prompt})
-        return response.text
+        return response
