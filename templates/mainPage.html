@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./resources/favicon.ico">
+    <link rel="stylesheet" href="./resources/styles.css">
+    <title>PIAIC 233234 Flask Assignment with RAG </title>
+</head>
+<body onload="checkChatURL(); document.querySelector('.chat-area').scrollTo({top: document.querySelector('.chat-area').scrollHeight, behavior: 'instant'});">
+    <main>
+        <div class="delete-chat-popup" hidden onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="delete-chat-popup-box">
+                <p class="delete-chat-popup-heading">Are you sure you want to delete this chat?</p>
+                <p class="delete-chat-popup-description">This action cannot be undone</p>
+                <button class="delete-chat-cancel-button" onclick="document.querySelector('.delete-chat-popup').hidden = true;">Cancel</button>
+                <button class="delete-chat-delete-button" onclick="localStorage.removeItem('ChatUUID4'); document.querySelector('.delete-chat-popup').hidden = true; window.location.href = '/'; localStorage.removeItem(`${localStorage.getItem('ChatUUID4')}_chat_history`); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click();">Delete</button>
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <img class="navbar-logo" src="./resources/favicon.ico">
+            <h1 class="navbar-title">UltraGPT</h1>
+            <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+        </nav>
+
+        <div class="chat-area" hidden>
+            
+        </div>
+
+        <div class="input-section">
+            <form class="input-form-container" onsubmit="event.preventDefault(); sendMessage()">
+                <label for="file"><img class="attach-file-img" style="inline-size: 41px; color: white;" src="./resources/attachFileDark.png"></label>
+                <input type="file" hidden>
+                <input type="text" class="message-input" placeholder="Message...">
+                <button class="send-button">Send</button>
+            </form>
+        </div>
+
+        <div class="suggestions-container" hidden>
+            <h1>What's on your mind?</h1>
+            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling lucky'; document.querySelector('.send-button').click()">I'm feeling lucky</button>
+            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling unlucky'; document.querySelector('.send-button').click()">I'm feeling unlucky</button>
+            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling neutral'; document.querySelector('.send-button').click()">I'm feeling neutral</button>
+        </div>
+
+        <script src="./resources/script.js"></script>
+    </main>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "langchain": "^0.3.11",
+    "uuid": "^11.0.4"
+  }
+}
