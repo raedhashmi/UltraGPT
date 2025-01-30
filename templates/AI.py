@@ -22,5 +22,5 @@ def AI(prompt: str) :
     if prompt == 'delete chat':
         memory.clear()
     else:
-        response = converstaion_chain.invoke({"input": prompt})
+        response = converstaion_chain.run({"input": prompt})
         return response

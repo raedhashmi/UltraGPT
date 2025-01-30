@@ -39,9 +39,6 @@ function newMsgString(response) {
 }
 
 async function sendMessage() {
-    if (window.location.href != `http://127.0.0.1:5000/${localStorage.getItem("ChatUUID4")}`) {
-        window.location.href = `/${localStorage.getItem("ChatUUID4")}`;
-    }
     document.querySelector('.suggestions-container').style.animation = "fade 0.4s linear";
     setTimeout(() => {
         document.querySelector('.suggestions-container').hidden = true;
@@ -59,8 +56,6 @@ async function sendMessage() {
         <br>
         <br>
     `;
-    prompt = document.querySelector('.message-input').value = '';
-    prompt = document.querySelector('.user-box-text').value;
 
     if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
@@ -89,14 +84,27 @@ async function sendMessage() {
 }
 
 function checkChatURL() {
-    if (window.location.href != `http://127.0.0.1:5000/${localStorage.getItem("ChatUUID4")}` || window.location.href == `http://127.0.0.1:5000/null` || window.location.href == 'http://127.0.0.1:5000') {
-        window.location.href = `/notfound`;
-    } else if (window.location.href == `http://127.0.0.1:5000/${localStorage.getItem("ChatUUID4")}`) {
-        document.querySelector('.suggestions-container').hidden = true;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const chatUUID = localStorage.getItem("ChatUUID4");
+    const currentURL = window.location.href;
+
+    if (isMobile) {
+        if (chatUUID && !currentURL.includes(`app.github.dev/${chatUUID}`)) {
+            window.location.href = 'app.github.dev/notfound';
+        }
+    } else {
+        if (chatUUID && currentURL !== `app.github.dev/${chatUUID}`) {
+            window.location.href = 'app.github.dev/notfound';
+        }
+    }
+
+    if (currentURL === `app.github.dev/${chatUUID}`) {
+        document.querySelector('.suggestions-container').hidden = false;
         document.querySelector('.chat-area').hidden = false;
-        if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null) {
-            document.querySelector('.chat-area').innerHTML = localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`);
-        } else if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) == null) {
+        const chatHistory = localStorage.getItem(`${chatUUID}_chat_history`);
+        if (chatHistory) {
+            document.querySelector('.chat-area').innerHTML = chatHistory;
+        } else {
             document.querySelector('.suggestions-container').hidden = false;
             document.querySelector('.chat-area').hidden = true;
             document.querySelector('.chat-area').innerHTML = '';
