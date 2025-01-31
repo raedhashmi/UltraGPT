@@ -3,10 +3,15 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
-import tqdm
+
+def setApiKey(apiKey: str):
+    with open('templates/GOOGLE_API_KEY.txt', 'w') as f:
+        f.write(apiKey)
+
+GOOGLE_API_KEY = open('templates/GOOGLE_API_KEY.txt').read().strip()
 
 llm = ChatGoogleGenerativeAI(
-    api_key=open('GOOGLE_API_KEY.txt').read().strip(),
+    api_key=GOOGLE_API_KEY,
     model="gemini-1.5-flash",
     temperature=0.7
 )

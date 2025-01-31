@@ -21,9 +21,9 @@
         <div class="missing-api-key-error" hidden onclick="if(event.target === this) { this.hidden = true; }">
             <div class="missing-api-key-error-box">
                 <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
-                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
-                <input type="text" class="missing-api-key-error-inout-box" placeholder="Your GOOGLE_API_KEY">
-                <button class="missing-api-key-error-button">Submit key</button>
+                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey", target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
             </div>
         </div>
 

@@ -113,7 +113,7 @@ body {
 
 .input-form-container {
     margin: 13px;
-    width: calc(13.5% - var(--max-width));
+    width: 13.5%;
 }
 
 .message-input {
@@ -186,7 +186,7 @@ body {
     width: 50px;
 }
 
-.delete-chat-popup {
+.delete-chat-popup, .missing-api-key-error {
     position: absolute;
     z-index: 50;
     top: 50%;
@@ -262,6 +262,75 @@ body {
 .delete-chat-delete-button:hover {
     cursor: pointer;
     background-color: rgb(255, 0, 0);
+    transition: all 0.2s ease-in-out;
+}
+
+.missing-api-key-error-box {
+    background-color: var(--shaded-color);
+    color: var(--foreground-color);
+    padding: 4px;
+    padding-right: 16px;
+    width: 74vw;
+    height: 20vw;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 9px;
+}
+
+.missing-api-key-error-heading {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    margin-left: 16px;
+}
+
+.missing-api-key-error-text {
+    font-size: 16px;
+    font-weight: 400;
+    margin-left: 18px;
+}
+
+.missing-api-key-error-text a {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--light-shaded-color);
+}
+
+.missing-api-key-error-text a:hover {
+    cursor: pointer;
+}
+
+.missing-api-key-error-input-box {
+    background-color: var(--background-color);
+    color: var(--foreground-color);
+    padding: 8px;
+    width: 71.8vw;
+    margin-left: 18px;
+    border-radius: 9px;
+    border: none;
+}
+
+.missing-api-key-error-input-box:focus {
+    outline: none;
+}
+
+.missing-api-key-error-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    width: 71.8vw;
+    padding: 8px;
+    font-size: large;
+    border-radius: 6px;
+    margin-left: 20px;
+    border: none;
+    margin-top: 20px;
+}
+
+.missing-api-key-error-button:hover {
+    cursor: pointer;
+    scale: 1.02;
     transition: all 0.2s ease-in-out;
 }
 

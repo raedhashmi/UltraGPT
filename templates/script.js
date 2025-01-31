@@ -4,28 +4,20 @@ if (localStorage.getItem("ChatUUID4") == null) {
     localStorage.setItem("ChatUUID4", ChatUUID4);
 }
 
+const GOOGLE_API_KEY = l;
+if (GOOGLE_API_KEY == "") {
+    document.querySelector('.message-input').value = '';
+    document.querySelector('.message-input').focus = false;
+    document.querySelector('.missing-api-key-error').hidden = false;
+    console.error("GOOGLE_API_KEY is incorrect");
+}
+
 const navColor = getComputedStyle(document.querySelector('.navbar')).getPropertyValue('--nav-color').trim();
 if (navColor == "#994700") {
     localStorage.setItem('darkMode', "false");
 } else if (navColor == "#381a00") {
     localStorage.setItem('darkMode', "true");
 }
-
-fetch('GOOGLE_API_KEY.txt')
-    .then(response => response.text())
-    .then(apiKey => {
-        if (!apiKey.trim()) {
-            document.querySelector('.missing-api-key-error').hidden = false;
-        } else {
-            document.querySelector('.missing-api-key-error').hidden = true;
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching the API key:', error);
-        document.querySelector('.missing-api-key-error').hidden = false;
-    });
-
-// ...existing code...
 
 if (localStorage.getItem('darkMode') == "true") {
     document.querySelector('.attach-file-img').src = './resources/attachFileDark.png';
@@ -76,54 +68,91 @@ async function sendMessage() {
     if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
-    document.querySelector('.message-input').disabled = true;
-    document.querySelector('.message-input').style.backgroundColor = "#282828";
-    document.querySelector('.message-input').style.cursor = "not-allowed";
-    setTimeout(async () => {
-        let response = await fetch('/ask', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ prompt: prompt }),
-        }).then(res => res.text());
-    document.querySelector('.message-input').disabled = false;
-    document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
-    document.querySelector('.message-input').style.cursor = "text";
+    if (GOOGLE_API_KEY == '') {
+        document.querySelector('.message-input').value = '';
+        document.querySelector('.message-input').focus = false;
+        document.querySelector('.missing-api-key-error').hidden = false;
+        console.error("GOOGLE_API_KEY is incorrect");
+    } else {
+        document.querySelector('.message-input').disabled = true;
+        document.querySelector('.message-input').style.backgroundColor = "#282828";
+        document.querySelector('.message-input').style.cursor = "not-allowed";
+        setTimeout(async () => {
+            let response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: prompt }),
+            }).then(res => res.text());
+        document.querySelector('.message-input').disabled = false;
+        document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
+        document.querySelector('.message-input').style.cursor = "text";
 
-        if (response.startsWith("AI: ")) {
-            response = response.substring(4);
-        }
+            if (response.startsWith("AI: ")) {
+                response = response.substring(4);
+            }
 
-        newMsgString(response);
-    }, 0);
+            newMsgString(response);
+        }, 0);
+    }
+}
+
+function replaceApiKey() {
+    localStorage.setItem('GOOGLE_API_KEY', document.querySelector('.missing-api-key-error-input-box').value);
+    const apiKey = localStorage.getItem('GOOGLE_API_KEY');
+    if (apiKey.startsWith("AIzaSy") && !apiKey.includes(" ")) {
+        setTimeout(async () => {
+            await fetch('/setApiKey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ apiKey: localStorage.getItem('GOOGLE_API_KEY').toString() }),
+            }).then(res => {
+                if (res.ok) {
+                    document.querySelector('.missing-api-key-error').hidden = true;
+                    document.querySelector('.missing-api-key-error-input-box').value = '';
+                    alert('Sucessfully set API Key');
+                } else {
+                    alert("Invalid API Key");
+                    document.querySelector('.missing-api-key-error-box').innerHTML = `
+                        <div class="missing-api-key-error-box">
+                            <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
+                            <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                            <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Sorry, could not set key. Try again later</p>
+                            <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                            <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+                        </div>`
+                }
+            });
+            
+            document.querySelector('.missing-api-key-error').hidden = true;
+            document.querySelector('.missing-api-key-error-input-box').value = '';
+        }, 0);
+    } else {
+        document.querySelector('.missing-api-key-error-box').innerHTML = `
+            <div class="missing-api-key-error-box">
+                <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Invalid API Key</p>
+                <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+            </div>`
+    }
+    
 }
 
 function checkChatURL() {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const chatUUID = localStorage.getItem("ChatUUID4");
-    const currentURL = window.location.href;
-
-    if (isMobile) {
-        if (chatUUID && !currentURL.includes(`app.github.dev/${chatUUID}`)) {
-            window.location.href = 'app.github.dev/notfound';
-        }
-    } else {
-        if (chatUUID && currentURL !== `app.github.dev/${chatUUID}`) {
-            window.location.href = 'app.github.dev/notfound';
-        }
-    }
-
-    if (currentURL === `app.github.dev/${chatUUID}`) {
-        document.querySelector('.suggestions-container').hidden = false;
-        document.querySelector('.chat-area').hidden = false;
-        const chatHistory = localStorage.getItem(`${chatUUID}_chat_history`);
-        if (chatHistory) {
-            document.querySelector('.chat-area').innerHTML = chatHistory;
+    if (window.location.pathname != `/${localStorage.getItem("ChatUUID4")}`) {
+        window.location.href = `/notfound`;
+    } else if (window.location.pathname == `/${localStorage.getItem("ChatUUID4")}`)
+        if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null) {
+            document.querySelector('.chat-area').innerHTML = localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`);
+            document.querySelector('.suggestions-container').hidden = true;
+            document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
         } else {
-            document.querySelector('.suggestions-container').hidden = false;
             document.querySelector('.chat-area').hidden = true;
-            document.querySelector('.chat-area').innerHTML = '';
+            document.querySelector('.suggestions-container').hidden = false;
         }
-    }
 }

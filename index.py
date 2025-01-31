@@ -1,5 +1,6 @@
 from flask import Flask, render_template, send_file, request, redirect
 from templates.AI import AI
+from templates.AI import setApiKey
 
 app = Flask(__name__)
 
@@ -19,12 +20,21 @@ def resource(resource):
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    data = request.get_json()  # Retrieve JSON data from the request
-    prompt = data.get('prompt')  # Get the prompt from the JSON data
+    data = request.get_json()
+    prompt = data.get('prompt')
     if not prompt:
         return "Error: No prompt provided", 400
-    response = AI(prompt)  # Call the AI function with the prompt
+    response = AI(prompt)
     return response
+
+@app.route('/setApiKey', methods=['POST'])
+def setapikey():
+    data = request.get_json()
+    apiKey = data.get('apiKey')
+    if not apiKey:
+        return "Error: No apiKey provided", 400
+    setApiKey(apiKey)
+    return 'Successfully set API Key', 200
 
 @app.route('/notfound')
 def notfound(): 
