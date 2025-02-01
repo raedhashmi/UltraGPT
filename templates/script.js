@@ -4,8 +4,16 @@ if (localStorage.getItem("ChatUUID4") == null) {
     localStorage.setItem("ChatUUID4", ChatUUID4);
 }
 
-const GOOGLE_API_KEY = l;
-if (GOOGLE_API_KEY == "") {
+async function fetchKey() {
+    const res = await fetch('/resources/GOOGLE_API_KEY.txt').then(res => res.text()).then(res => res.trim());
+    const apiKey = res;
+    localStorage.setItem("GOOGLE_API_KEY", apiKey);
+    return apiKey.trim();
+};
+
+const FETCHED_GOOGLE_API_KEY = fetchKey();
+const GOOGLE_API_KEY = localStorage.getItem("GOOGLE_API_KEY");
+if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
     document.querySelector('.message-input').value = '';
     document.querySelector('.message-input').focus = false;
     document.querySelector('.missing-api-key-error').hidden = false;
@@ -68,12 +76,12 @@ async function sendMessage() {
     if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
-    if (GOOGLE_API_KEY == '') {
+    if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
         document.querySelector('.message-input').value = '';
         document.querySelector('.message-input').focus = false;
         document.querySelector('.missing-api-key-error').hidden = false;
         console.error("GOOGLE_API_KEY is incorrect");
-    } else {
+    } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy')) {
         document.querySelector('.message-input').disabled = true;
         document.querySelector('.message-input').style.backgroundColor = "#282828";
         document.querySelector('.message-input').style.cursor = "not-allowed";
@@ -99,23 +107,24 @@ async function sendMessage() {
 }
 
 function replaceApiKey() {
-    localStorage.setItem('GOOGLE_API_KEY', document.querySelector('.missing-api-key-error-input-box').value);
-    const apiKey = localStorage.getItem('GOOGLE_API_KEY');
+    const apiKey = document.querySelector('.missing-api-key-error-input-box').value;
     if (apiKey.startsWith("AIzaSy") && !apiKey.includes(" ")) {
+        localStorage.setItem('GOOGLE_API_KEY', apiKey)
         setTimeout(async () => {
             await fetch('/setApiKey', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ apiKey: localStorage.getItem('GOOGLE_API_KEY').toString() }),
+                body: JSON.stringify({ apiKey: apiKey}),
             }).then(res => {
                 if (res.ok) {
                     document.querySelector('.missing-api-key-error').hidden = true;
                     document.querySelector('.missing-api-key-error-input-box').value = '';
                     alert('Sucessfully set API Key');
+                    window.location.reload()
+                    window.location.reload()
                 } else {
-                    alert("Invalid API Key");
                     document.querySelector('.missing-api-key-error-box').innerHTML = `
                         <div class="missing-api-key-error-box">
                             <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
