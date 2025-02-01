@@ -11,7 +11,7 @@ async function fetchKey() {
     return apiKey.trim();
 };
 
-const FETCHED_GOOGLE_API_KEY = fetchKey();
+fetchKey();
 const GOOGLE_API_KEY = localStorage.getItem("GOOGLE_API_KEY");
 if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
     document.querySelector('.message-input').value = '';

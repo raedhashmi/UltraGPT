@@ -5,7 +5,7 @@
     --shaded-color: rgb(206, 206, 206);
     --dark-shaded-color: rgb(106, 106, 106);
     --light-shaded-color: rgb(223, 223, 223);
-    --nav-color: #994700;
+    --nav-color: linear-gradient(to right, #994700, #3a1b00);
     overflow: hidden;
     background-color: var(--background-color);
     color: var(--foreground-color);
@@ -18,7 +18,7 @@
         --shaded-color: rgb(12, 12, 12);
         --light-shaded-color: rgb(47, 47, 47);
         --max-width: max-content;
-        --nav-color: #381a00;
+        --nav-color: linear-gradient(to right, #5e2c00, #381a00);
     }
 }
 
@@ -35,7 +35,7 @@ body {
 
 .navbar {
     padding: 22px;
-    background-color: var(--nav-color);
+    background: var(--nav-color);
 }
 
 .navbar-title {
