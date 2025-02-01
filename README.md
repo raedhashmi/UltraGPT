@@ -34,4 +34,4 @@ python index.py
 
 ## API Key Management
 
-If `GOOGLE_API_KEY.txt` does not contain a valid API key, the application will prompt an error message and ask you to obtain an API key from [Google AI Studio](https://aistudio.google.com/app/apikey?utm_source=colab.research.google.com&utm_medium=referral&utm_campaign=colab-integration&utm_content=owned-promo).
+If `GOOGLE_API_KEY.txt` does not contain a valid API key, the application will prompt an error message and ask you to obtain an API key from [Google AI Studio](https://aistudio.google.com/app/apikey?utm_source=colab.research.google.com&utm_medium=referral&utm_campaign=colab-integration&utm_content=owned-promo). After adding the key, restart the Flask app for the changes to take effect.
