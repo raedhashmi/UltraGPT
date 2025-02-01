@@ -7,9 +7,9 @@ UltraGPT is a simple AI-powered interface that allows users to interact with an 
 To set up UltraGPT, install the required dependencies using the following commands:
 
 ```sh
-pip install flask
-pip install langchain_google_genai
-pip install langchain
+pip install flask -qU
+pip install langchain_google_genai -qU
+pip install langchain -qU
 ```
 
 ## Setup
