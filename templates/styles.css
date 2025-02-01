@@ -41,8 +41,27 @@ body {
 .navbar-title {
     opacity: 100%;
     margin: 5px;
+    margin-bottom: 12px;
     margin-left: 80px;
     color: white;
+}
+
+.creds {
+    opacity: 100%;
+    margin: 5px;
+    margin-left: 116px;
+    margin-top: -20px;
+    font-size: 11px;
+    color: white;
+}
+
+.creds a {
+    color: white;
+    text-decoration: none;
+}
+
+.creds a:hover {
+    text-decoration: underline;
 }
 
 .chat-area {
