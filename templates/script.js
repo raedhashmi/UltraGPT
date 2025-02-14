@@ -33,6 +33,12 @@ if (localStorage.getItem('darkMode') == "true") {
     document.querySelector('.attach-file-img').src = './resources/attachFileLight.png';
 }
 
+if (localStorage.getItem('loggedIn') == 'true') {
+    document.querySelector('.model-warning').hidden = true;
+} else if (localStorage.getItem('loggedIn') == 'false') {
+    document.querySelector('.model-warning').hidden = false;
+}
+
 function newMsgString(response) {
     if (response.includes('**')) {
         response = response.replace(/\*' '\*\*(.*?)\*\*/g, '<b>$1</b>');

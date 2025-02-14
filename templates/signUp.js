@@ -8,45 +8,49 @@ const password = document.querySelector('.signup-box-password-input');
 if (localStorage.getItem('users') == null || localStorage.getItem('users') == "[object Object]")
     localStorage.setItem('users', '[]')
 
-let users = JSON.parse(localStorage.getItem('users'));
+let users = JSON.parse(localStorage.getItem('users') || '[]');
 
 function signUp() {    
-    if (username.value == '' || password.value == '') {
+    if (username.value === '' || password.value === '') {
         errorbox.hidden = false;
         signupbox.style.height = '55%';
+        errorboxtext.innerText = 'Username or password is empty';
         console.error('Username or password is empty');
-    } else if (username.value != '' && password.value != '') {
-        users = [...users, { username: username.value, password: password.value, ChatUUID: Math.random().toString(36).substring(2, 15) + "-" + Math.random().toString(36).substring(2, 15) }];
-        localStorage.setItem('users', JSON.stringify(users));
-    } 
-    
-    for (i = 0; i < i+1; i++) {
-        setTimeout(() => {
-            for (j = 0; j < users.length; j++) {
-                if (users[j].username.includes(username.value)) {
-                    localStorage.setItem('usernameTaken', 'true');
-                } else if (!users[j].username.includes(username.value)) {
-                    localStorage.setItem('usernameTaken', 'false');
-                }
-            }
-            console.log(i)
-        }, 1000);`                                                                                                                                                                                                                                                                                          `
+        return;
     }
-    
 
-    if (localStorage.getItem('usernameTaken') == 'true') {
+    // Get latest users array from localStorage
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Check if username already exists
+    const userExists = users.some(user => user.username === username.value);
+    
+    if (userExists) {
         errorbox.hidden = false;
         signupbox.style.height = '55%';
         errorboxtext.innerText = 'Username already taken';
         console.error('Username already taken');
-    } else {
-        errorbox.hidden = false;
-        signupButton.innerText = '';
-        signupButton.style.animation = "expand 0.8s linear";
-        setTimeout(() => {
-            window.location.href = '/login';
-        }, 700);
+        return;
     }
+
+    // Add new user
+    const newUser = {
+        username: username.value,
+        password: password.value,
+        ChatUUID: Math.random().toString(36).substring(2, 15) + "-" + Math.random().toString(36).substring(2, 15)
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Show success animation and redirect
+    errorbox.hidden = true;
+    console.log("User created successfully");
+    signupButton.innerText = '';
+    signupButton.style.animation = "expand 0.8s linear";
+    setTimeout(() => {
+        window.location.href = '/login';
+    }, 700);
 }
 
 function checkChatURL() {

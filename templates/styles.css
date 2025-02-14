@@ -439,6 +439,27 @@ body {
     border-radius: 9px;
 }
 
+.model-warning {
+    background-color: var(--shaded-color);
+    color: var(--foreground-color);
+    padding: 4px;
+    font-size: 8px;
+    position: relative;
+    font-weight: medium;
+    left: 50%;
+    transform: translate(-50%);
+    margin-top: 6px;
+    border-radius: 9px;
+    text-align: center;
+    width: 28%;
+    height: 30%;
+}
+
+.model-warning p {
+    font-size: 12px;
+    font-weight: 400;
+}
+
 @keyframes expand {
     0% {
         transform: translate(-50%, -50%) scale(1);
