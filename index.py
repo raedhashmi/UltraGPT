@@ -6,11 +6,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('mainPage.html')
+    return send_file('templates/index.html')
 
 @app.route('/<ChatUUID4>')
 def conversation(ChatUUID4):
-    return render_template('mainPage.html')
+    return send_file('templates/index.html')
 
 @app.route('/resources/<resource>')
 def resource(resource):
@@ -36,9 +36,17 @@ def setapikey():
     setApiKey(apiKey)
     return 'Successfully set API Key', 200
 
+@app.route('/signUp')
+def signup():
+    return send_file('templates/signUp.html')
+
+@app.route('/login')
+def login():    
+    return send_file('templates/login.html')
+
 @app.route('/notfound')
 def notfound(): 
-    return render_template('notfound.html')
+    return send_file('templates/notfound.html')
 
 @app.route('/<path:path>')
 def catch_all(path):

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./resources/favicon.ico">
+    <link rel="stylesheet" href="./resources/styles.css">
+    <title>UltraGPT - Sign Up</title>
+</head>
+<body onload="checkChatURL();">
+    <main>
+        <div class="delete-chat-popup" hidden onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="delete-chat-popup-box">
+                <p class="delete-chat-popup-heading">Are you sure you want to delete this chat?</p>
+                <p class="delete-chat-popup-description">This action cannot be undone</p>
+                <button class="delete-chat-cancel-button" onclick="document.querySelector('.delete-chat-popup').hidden = true;">Cancel</button>
+                <button class="delete-chat-delete-button" onclick="localStorage.removeItem('ChatUUID4'); document.querySelector('.delete-chat-popup').hidden = true; window.location.href = '/'; localStorage.removeItem(`${localStorage.getItem('ChatUUID4')}_chat_history`); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click();">Delete</button>
+            </div>
+        </div>
+
+        <div class="missing-api-key-error" hidden onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="missing-api-key-error-box">
+                <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey", target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <img class="navbar-logo" src="./resources/favicon.ico">
+            <h1 class="navbar-title">UltraGPT <p class="creds">By <a href="https://github.com/raedhashmi/UltraGPT" target='_blank'>raedhashmi</a></p></h1>
+            <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+        </nav>
+
+        <div class='signup-box'>
+            <h1 class="signup-heading">Sign Up</h1>
+            <form onsubmit="event.preventDefault(); signUp();" class="signup-form">
+                <div class='error-box' hidden>
+                    <p class="error-box-text">Please enter a username and password</p>
+                </div>
+    
+                <input type="text" class="signup-box-username-input" placeholder="Username">
+                <br>
+                <input type="password" class="signup-box-password-input" placeholder="Password">
+                <br>
+                <button class="signup-button" type="submit">Sign Up</button>
+            </form>
+            
+        </div>
+
+        <script src="./resources/signUp.js"></script>
+    </main>
+</body>
+</html>

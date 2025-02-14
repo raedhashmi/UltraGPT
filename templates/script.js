@@ -108,7 +108,7 @@ async function sendMessage() {
 
 function replaceApiKey() {
     const apiKey = document.querySelector('.missing-api-key-error-input-box').value;
-    if (apiKey.startsWith("AIzaSy") && !apiKey.includes(" ")) {
+    if (apiKey.startsWith("AIzaSy") && !apiKey.includes(" ") && apiKey.length >= 39) {
         localStorage.setItem('GOOGLE_API_KEY', apiKey)
         setTimeout(async () => {
             await fetch('/setApiKey', {

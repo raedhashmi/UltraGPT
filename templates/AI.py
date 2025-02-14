@@ -13,7 +13,7 @@ GOOGLE_API_KEY = open('templates/GOOGLE_API_KEY.txt').read().strip()
 llm = ChatGoogleGenerativeAI(
     api_key=GOOGLE_API_KEY,
     model="gemini-1.5-flash",
-    temperature=0.7
+    temperature=0.7,
 )
 
 memory = ConversationBufferMemory()

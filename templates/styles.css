@@ -16,9 +16,10 @@
         --foreground-color: white;
         --background-color: black;
         --shaded-color: rgb(12, 12, 12);
+        --dark-shaded-color: rgb(8, 8, 8);
         --light-shaded-color: rgb(47, 47, 47);
         --max-width: max-content;
-        --nav-color: linear-gradient(to right, #5e2c00, #381a00);
+        --nav-color: linear-gradient(to right, #8f4300, #381a00);
     }
 }
 
@@ -30,6 +31,7 @@ body {
     position: absolute;
     top: 2.8%;
     height: 50px;
+    margin: 0px;
     margin: 0px 15px;
 }
 
@@ -58,6 +60,7 @@ body {
 .creds a {
     color: white;
     text-decoration: none;
+    font-family: monospace;
 }
 
 .creds a:hover {
@@ -353,15 +356,6 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-@keyframes fade {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }    
-}
-
 .no-data-message {
     position: absolute;
     font-size: 50px;
@@ -389,6 +383,62 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
+.signup-box, .login-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 20%;
+    height: 45%;
+    background-color: var(--shaded-color);
+    text-align: center;
+    border-radius: 9px;
+    padding: 20px;
+    padding-top: 10px;
+}
+
+.signup-box-username-input, .signup-box-password-input, .login-box-username-input, .login-box-password-input {
+    background-color: var(--dark-shaded-color);
+    color: var(--foreground-color);
+    width: 17vw;
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    margin-bottom: 10px;
+}
+
+.signup-box-username-input:focus, .signup-box-password-input:focus, .login-box-username-input:focus, .login-box-password-input:focus {
+    outline: none;
+}
+
+.signup-button, .login-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    width: 18.5vw;
+    padding: 8px;
+    font-size: large;
+    border-radius: 6px;
+    border: none;
+    margin-top: 2px;
+}
+
+.signup-button:hover, .login-button:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.error-box {
+    background-color: #810000;
+    font-size: 14px;
+    width: 18.8vw;
+    padding: 0.02px;
+    margin-top: -12px;
+    margin-bottom: 12px;
+    margin-left: 8px;
+    border-radius: 9px;
+}
+
 @keyframes expand {
     0% {
         transform: translate(-50%, -50%) scale(1);
@@ -410,6 +460,15 @@ body {
         transform: translate(-50%, -50%) scale(1);
         background-color: var(--shaded-color);
     }
+}
+
+@keyframes fade {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }    
 }
 
 ::-webkit-scrollbar {

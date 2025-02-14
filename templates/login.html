@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="./resources/favicon.ico">
     <link rel="stylesheet" href="./resources/styles.css">
-    <title>UltraGPT</title>
+    <title>UltraGPT - Sign Up</title>
 </head>
-<body onload="checkChatURL(); document.querySelector('.chat-area').scrollTo({top: document.querySelector('.chat-area').scrollHeight, behavior: 'instant'});">
+<body onload="checkChatURL();">
     <main>
         <div class="delete-chat-popup" hidden onclick="if(event.target === this) { this.hidden = true; }">
             <div class="delete-chat-popup-box">
@@ -33,27 +33,23 @@
             <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
         </nav>
 
-        <div class="chat-area">
+        <div class='login-box'>
+            <h1 class="login-heading">Login</h1>
+            <form onsubmit="event.preventDefault(); login();" class="login-form">
+                <div class='error-box' hidden>
+                    <p class="error-box-text">Incorrect username or password</p>
+                </div>
+    
+                <input type="text" class="login-box-username-input" placeholder="Username">
+                <br>
+                <input type="password" class="login-box-password-input" placeholder="Password">
+                <br>
+                <button class="login-button" type="submit">Login</button>
+            </form>
             
         </div>
 
-        <div class="input-section">
-            <form class="input-form-container" onsubmit="event.preventDefault(); sendMessage()">
-                <label for="file"><img class="attach-file-img" style="inline-size: 41px; color: white;" src="./resources/attachFileDark.png"></label>
-                <input type="file" hidden>
-                <input type="text" class="message-input" placeholder="Message...">
-                <button class="send-button">Send</button>
-            </form>
-        </div>
-
-        <div class="suggestions-container">
-            <h1>What's on your mind?</h1>
-            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling lucky'; document.querySelector('.send-button').click()">I'm feeling lucky</button>
-            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling unlucky'; document.querySelector('.send-button').click()">I'm feeling unlucky</button>
-            <button class="suggestion-button" onclick="document.querySelector('.message-input').value = 'Im feeling neutral'; document.querySelector('.send-button').click()">I'm feeling neutral</button>
-        </div>
-
-        <script src="./resources/script.js"></script>
+        <script src="./resources/login.js"></script>
     </main>
 </body>
 </html>
