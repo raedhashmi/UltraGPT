@@ -4,16 +4,27 @@ if (localStorage.getItem("ChatUUID4") == null) {
     localStorage.setItem("ChatUUID4", ChatUUID4);
 }
 
-async function fetchKey() {
+async function fetchGoogleKey() {
     const res = await fetch('/resources/GOOGLE_API_KEY.txt').then(res => res.text()).then(res => res.trim());
     const apiKey = res;
     localStorage.setItem("GOOGLE_API_KEY", apiKey);
     return apiKey.trim();
 };
 
-fetchKey();
+async function fetchOpenAiKey() {
+    const res = await fetch('/resources/OPENAI_API_KEY.txt').then(res => res.text()).then(res => res.trim());
+    const apiKey = res;
+    localStorage.setItem("OPENAI_API_KEY", apiKey);
+    return apiKey.trim();
+};
+
+fetchGoogleKey();
+fetchOpenAiKey();
+
 const GOOGLE_API_KEY = localStorage.getItem("GOOGLE_API_KEY");
-if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
+const OPENAI_API_KEY = localStorage.getItem("OPENAI_API_KEY");
+
+if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
     document.querySelector('.message-input').value = '';
     document.querySelector('.message-input').focus = false;
     document.querySelector('.missing-api-key-error').hidden = false;
@@ -82,33 +93,66 @@ async function sendMessage() {
     if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
-    if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
-        document.querySelector('.message-input').value = '';
-        document.querySelector('.message-input').focus = false;
-        document.querySelector('.missing-api-key-error').hidden = false;
-        console.error("GOOGLE_API_KEY is incorrect");
-    } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy')) {
-        document.querySelector('.message-input').disabled = true;
-        document.querySelector('.message-input').style.backgroundColor = "#282828";
-        document.querySelector('.message-input').style.cursor = "not-allowed";
-        setTimeout(async () => {
-            let response = await fetch('/ask', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt: prompt }),
-            }).then(res => res.text());
-        document.querySelector('.message-input').disabled = false;
-        document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
-        document.querySelector('.message-input').style.cursor = "text";
+    if (localStorage.getItem('loggedIn') == 'false') {
+        if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
+            document.querySelector('.message-input').value = '';
+            document.querySelector('.message-input').focus = false;
+            document.querySelector('.missing-api-key-error').hidden = false;
+            console.error("GOOGLE_API_KEY is incorrect");
+        } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy')) {         
+            document.querySelector('.model-warning').hidden = false;
+            document.querySelector('.message-input').disabled = true;
+            document.querySelector('.message-input').style.backgroundColor = "#282828";
+            document.querySelector('.message-input').style.cursor = "not-allowed";
+            setTimeout(async () => {
+                let response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt, loggedIn: 'false' }),
+                }).then(res => res.text());
+            document.querySelector('.message-input').disabled = false;
+            document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
+            document.querySelector('.message-input').style.cursor = "text";
 
-            if (response.startsWith("AI: ")) {
-                response = response.substring(4);
-            }
+                if (response.startsWith("AI: ")) {
+                    response = response.substring(4);
+                }
 
-            newMsgString(response);
-        }, 0);
+                newMsgString(response);
+            }, 0);
+        }
+    } else if (localStorage.getItem('loggedIn') == 'true') {
+        if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
+            document.querySelector('.message-input').value = '';
+            document.querySelector('.message-input').focus = false;
+            document.querySelector('.missing-api-key-error').hidden = false;
+            console.error("OPENAI_API_KEY is incorrect");
+        } else if (OPENAI_API_KEY != 'MISSING_KEY' && OPENAI_API_KEY != '' && OPENAI_API_KEY.startsWith('sk-')) {
+            document.querySelector('.model-warning').hidden = true;
+            document.querySelector('.message-input').disabled = true;
+            document.querySelector('.message-input').style.backgroundColor = "#282828";
+            document.querySelector('.message-input').style.cursor = "not-allowed";
+            setTimeout(async () => {
+                let response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt, loggedIn: 'true' }),
+                }).then(res => res.text());
+            document.querySelector('.message-input').disabled = false;
+            document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
+            document.querySelector('.message-input').style.cursor = "text";
+
+                if (response.startsWith("AI: ")) {
+                    response = response.substring(4);
+                }
+
+                newMsgString(response);
+            }, 0);
+        }
     }
 }
 
@@ -165,6 +209,11 @@ function checkChatURL() {
         if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null) {
             document.querySelector('.chat-area').innerHTML = localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`);
             document.querySelector('.suggestions-container').hidden = true;
+            if (localStorage.getItem('loggedIn') == 'true') {
+                document.querySelector('.model-warning').hidden = true;
+            } else if (localStorage.getItem('loggedIn') == 'false') {
+                document.querySelector('.model-warning').hidden = false;
+            }
             document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
         } else {
             document.querySelector('.chat-area').hidden = true;

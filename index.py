@@ -1,6 +1,7 @@
 from flask import Flask, render_template, send_file, request, redirect
 from templates.AI import AI
-from templates.AI import setApiKey
+from templates.AI import setGoogleApiKey
+from templates.AI import setOpenAiApiKey
 
 app = Flask(__name__)
 
@@ -22,19 +23,33 @@ def resource(resource):
 def ask():
     data = request.get_json()
     prompt = data.get('prompt')
+    loggedIn = data.get('loggedIn')
     if not prompt:
         return "Error: No prompt provided", 400
-    response = AI(prompt)
-    return response
+    response = AI(prompt, loggedIn)
+    if loggedIn == 'true':
+        return response.content
+    else:
+        return response
 
-@app.route('/setApiKey', methods=['POST'])
-def setapikey():
+@app.route('/setGoogleApiKey', methods=['POST'])
+def setGoogleApiKey():
+    data = request.get_json()
+    apiKey = data.get('apiKey')
+    loggedIn = data.get('loggedIn')
+    if not apiKey:
+        return "Error: No apiKey provided", 400
+    setGoogleApiKey(apiKey)
+    return 'Successfully set Google API Key', 200
+
+@app.route('/setOpenAiApiKey', methods=['POST'])
+def setOpenAIApiKey():
     data = request.get_json()
     apiKey = data.get('apiKey')
     if not apiKey:
         return "Error: No apiKey provided", 400
-    setApiKey(apiKey)
-    return 'Successfully set API Key', 200
+    setOpenAiApiKey(apiKey)
+    return 'Successfully set OpenAI API Key', 200
 
 @app.route('/signUp')
 def signup():
