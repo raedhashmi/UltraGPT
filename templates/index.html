@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <div class="account-settings" onclick="if(event.target === this) { this.hidden = true; }">
+        <div class="account-settings" hidden onclick="if(event.target === this) { this.hidden = true; }">
             <div class="account-settings-sidebar">
                 <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = false; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Account</button>
                 <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = false; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Change theme colors</button>                
