@@ -130,8 +130,8 @@ async function sendMessage() {
             document.querySelector('.message-input').focus = false;
             document.querySelector('.missing-google-api-key-error').hidden = false;
             console.error("GOOGLE_API_KEY is incorrect");
-        } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy') && GOOGLE_API_KEY.length == 39) {         
-            document.querySelector('.model-warning').hidden = false;
+        } else {
+            document.querySelector('.model-warning').hidden = true;
             document.querySelector('.message-input').disabled = true;
             document.querySelector('.message-input').style.backgroundColor = "#282828";
             document.querySelector('.message-input').style.cursor = "not-allowed";
@@ -155,15 +155,13 @@ async function sendMessage() {
             }, 0);
         }
     } else if (localStorage.getItem('loggedIn') == 'true') {
-        document.querySelector('.delete-chat-icon').hidden = true;
-        document.querySelector('.account-button').hidden = false;
         if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
             document.querySelector('.missing-openai-api-key-error').hidden = false;
             document.querySelector('.missing-openai-api-key-error-text').innerHTML = 'The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys", target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: ';
             console.error("OPENAI_API_KEY is incorrect");
-        } else if (OPENAI_API_KEY != 'MISSING_KEY' && OPENAI_API_KEY != '' && OPENAI_API_KEY.startsWith('sk-')) {
+        } else {
             document.querySelector('.model-warning').hidden = true;
             document.querySelector('.message-input').disabled = true;
             document.querySelector('.message-input').style.backgroundColor = "#282828";

@@ -27,10 +27,7 @@ def ask():
     if not prompt:
         return "Error: No prompt provided", 400
     response = AI(prompt, loggedIn)
-    if loggedIn == 'true':
-        return response.content
-    else:
-        return response
+    return response
 
 @app.route('/setGoogleApiKey', methods=['POST'])
 def set_google_api_key():
