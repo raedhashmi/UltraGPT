@@ -24,11 +24,16 @@ fetchOpenAiKey();
 const GOOGLE_API_KEY = localStorage.getItem("GOOGLE_API_KEY");
 const OPENAI_API_KEY = localStorage.getItem("OPENAI_API_KEY");
 
-if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
+if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
     document.querySelector('.message-input').value = '';
     document.querySelector('.message-input').focus = false;
-    document.querySelector('.missing-api-key-error').hidden = false;
+    document.querySelector('.missing-google-api-key-error').hidden = false;
     console.error("GOOGLE_API_KEY is incorrect");
+} else if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
+    document.querySelector('.message-input').value = '';
+    document.querySelector('.message-input').focus = false;
+    document.querySelector('.missing-openai-api-key-error').hidden = false;
+    console.error("OPENAI_API_KEY is incorrect");
 }
 
 const navColor = getComputedStyle(document.querySelector('.navbar')).getPropertyValue('--nav-color').trim();
@@ -46,8 +51,34 @@ if (localStorage.getItem('darkMode') == "true") {
 
 if (localStorage.getItem('loggedIn') == 'true') {
     document.querySelector('.model-warning').hidden = true;
-} else if (localStorage.getItem('loggedIn') == 'false') {
+    document.querySelector('.delete-chat-icon').hidden = true;
+    document.querySelector('.account-button').hidden = false;
+} else if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
     document.querySelector('.model-warning').hidden = false;
+    document.querySelector('.delete-chat-icon').hidden = false;
+    document.querySelector('.account-button').hidden = true;
+}
+
+if (localStorage.getItem('navbar-color') == null) {
+    document.getElementById('navbar-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color').trim();
+} else if (localStorage.getItem('navbar-color') != null) {
+    document.getElementById('navbar-color').value = localStorage.getItem('navbar-color');
+} else if (localStorage.getItem('shaded-color') == null) {
+    document.getElementById('shaded-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--light-shaded-color').trim();
+} else if (localStorage.getItem('shaded-color') != null) {
+    document.getElementById('shaded-color').value = localStorage.getItem('shaded-color');
+} else if (localStorage.getItem('dark-shaded-color') == null) {
+    document.getElementById('dark-shaded-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--dark-shaded-color').trim();
+} else if (localStorage.getItem('dark-shaded-color') != null) {
+    document.getElementById('dark-shaded-color').value = localStorage.getItem('dark-shaded-color');
+} else if (localStorage.getItem('foreground-color') == null) {
+    document.getElementById('foreground-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--foreground-color').trim();
+} else if (localStorage.getItem('foreground-color') != null) {
+    document.getElementById('foreground-color').value = localStorage.getItem('foreground-color');
+} else if (localStorage.getItem('background-color') == null) {
+    document.getElementById('background-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--background-color').trim();
+} else if (localStorage.getItem('background-color') != null) {
+    document.getElementById('background-color').value = localStorage.getItem('background-color');
 }
 
 function newMsgString(response) {
@@ -94,12 +125,12 @@ async function sendMessage() {
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
     if (localStorage.getItem('loggedIn') == 'false') {
-        if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
+        if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || GOOGLE_API_KEY.length != 39) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
-            document.querySelector('.missing-api-key-error').hidden = false;
+            document.querySelector('.missing-google-api-key-error').hidden = false;
             console.error("GOOGLE_API_KEY is incorrect");
-        } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy')) {         
+        } else if (GOOGLE_API_KEY != 'MISSING_KEY' && GOOGLE_API_KEY != '' && GOOGLE_API_KEY.startsWith('AIzaSy') && GOOGLE_API_KEY.length == 39) {         
             document.querySelector('.model-warning').hidden = false;
             document.querySelector('.message-input').disabled = true;
             document.querySelector('.message-input').style.backgroundColor = "#282828";
@@ -124,10 +155,13 @@ async function sendMessage() {
             }, 0);
         }
     } else if (localStorage.getItem('loggedIn') == 'true') {
+        document.querySelector('.delete-chat-icon').hidden = true;
+        document.querySelector('.account-button').hidden = false;
         if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
-            document.querySelector('.missing-api-key-error').hidden = false;
+            document.querySelector('.missing-openai-api-key-error').hidden = false;
+            document.querySelector('.missing-openai-api-key-error-text').innerHTML = 'The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys", target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: ';
             console.error("OPENAI_API_KEY is incorrect");
         } else if (OPENAI_API_KEY != 'MISSING_KEY' && OPENAI_API_KEY != '' && OPENAI_API_KEY.startsWith('sk-')) {
             document.querySelector('.model-warning').hidden = true;
@@ -156,50 +190,92 @@ async function sendMessage() {
     }
 }
 
-function replaceApiKey() {
-    const apiKey = document.querySelector('.missing-api-key-error-input-box').value;
+function replaceGoogleApiKey() {
+    const apiKey = document.querySelector('.missing-google-api-key-error-input-box').value;
     if (apiKey.startsWith("AIzaSy") && !apiKey.includes(" ") && apiKey.length >= 39) {
         localStorage.setItem('GOOGLE_API_KEY', apiKey)
         setTimeout(async () => {
-            await fetch('/setApiKey', {
+            await fetch('/setGoogleApiKey', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ apiKey: apiKey}),
+                body: JSON.stringify({ apiKey: apiKey }),
             }).then(res => {
                 if (res.ok) {
-                    document.querySelector('.missing-api-key-error').hidden = true;
-                    document.querySelector('.missing-api-key-error-input-box').value = '';
-                    alert('Sucessfully set API Key');
-                    window.location.reload()
+                    document.querySelector('.missing-google-api-key-error').hidden = true;
+                    document.querySelector('.missing-google-api-key-error-input-box').value = '';
+                    alert('Sucessfully set Google API Key');
                     window.location.reload()
                 } else {
-                    document.querySelector('.missing-api-key-error-box').innerHTML = `
-                        <div class="missing-api-key-error-box">
-                            <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
-                            <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                    document.querySelector('.missing-google-api-key-error-box').innerHTML = `
+                        <div class="missing-google-api-key-error-box">
+                            <h1 class="missing-google-api-key-error-heading">There is an error in your code</h1>
+                            <p class="missing-google-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
                             <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Sorry, could not set key. Try again later</p>
-                            <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
-                            <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+                            <input type="text" class="missing-google-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                            <button class="missing-google-api-key-error-button" onclick="replaceGoogleApiKey();">Submit key</button>
                         </div>`
                 }
             });
             
-            document.querySelector('.missing-api-key-error').hidden = true;
-            document.querySelector('.missing-api-key-error-input-box').value = '';
+            document.querySelector('.missing-google-api-key-error').hidden = true;
+            document.querySelector('.missing-google-api-key-error-input-box').value = '';
         }, 0);
     } else {
-        document.querySelector('.missing-api-key-error-box').innerHTML = `
-            <div class="missing-api-key-error-box">
-                <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
-                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+        document.querySelector('.missing-google-api-key-error-box').innerHTML = `
+            <div class="missing-google-api-key-error-box">
+                <h1 class="missing-google-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-google-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey" ,="" target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
                 <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Invalid API Key</p>
-                <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
-                <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+                <input type="text" class="missing-google-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                <button class="missing-google-api-key-error-button" onclick="replaceGoogleApiKey();">Submit key</button>
             </div>`
     }
-    
+}
+
+function replaceOpenAiApiKey() {
+    const apiKey = document.querySelector('.missing-openai-api-key-error-input-box').value;
+    if (apiKey.startsWith("sk-") && !apiKey.includes(" ")) {
+        localStorage.setItem('OPENAI_API_KEY', apiKey)
+        setTimeout(async () => {
+            await fetch('/setOpenAiApiKey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ apiKey: apiKey }),
+            }).then(res => {
+                if (res.ok) {
+                    document.querySelector('.missing-openai-api-key-error').hidden = true;
+                    document.querySelector('.missing-openai-api-key-error-input-box').value = '';
+                    alert('Sucessfully set OpenAI API Key');
+                    window.location.reload()
+                } else {
+                    document.querySelector('.missing-openai-api-key-error-box').innerHTML = `
+                        <div class="missing-openai-api-key-error-box">
+                            <h1 class="missing-openai-api-key-error-heading">There is an error in your code</h1>
+                            <p class="missing-openai-api-key-error-text">The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys" ,="" target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: </p>
+                            <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Sorry, could not set key. Try again later</p>
+                            <input type="text" class="missing-openai-api-key-error-input-box" placeholder="Your OPENAI_API_KEY">
+                            <button class="missing-openai-api-key-error-button" onclick="replaceOpenAiApiKey();">Submit key</button>
+                        </div>`
+                }
+            });
+            
+            document.querySelector('.missing-openai-api-key-error').hidden = true;
+            document.querySelector('.missing-openai-api-key-error-input-box').value = '';
+        }, 0);
+    } else {
+        document.querySelector('.missing-openai-api-key-error-box').innerHTML = `
+            <div class="missing-openai-api-key-error-box">
+                <h1 class="missing-openai-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-openai-api-key-error-text">The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys" ,="" target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: </p>
+                <p style="color: red; font-size: 10px; transform: translate(4.5%, 150%); position: relative; left: -13px; margin-top: -20px;">Invalid API Key</p>
+                <input type="text" class="missing-openai-api-key-error-input-box" placeholder="Your OPENAI_API_KEY">
+                <button class="missing-openai-api-key-error-button" onclick="replaceOpenAiApiKey();">Submit key</button>
+            </div>`
+    }
 }
 
 function checkChatURL() {

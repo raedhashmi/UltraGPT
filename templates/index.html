@@ -18,19 +18,111 @@
             </div>
         </div>
 
-        <div class="missing-api-key-error" hidden onclick="if(event.target === this) { this.hidden = true; }">
-            <div class="missing-api-key-error-box">
-                <h1 class="missing-api-key-error-heading">There is an error in your code</h1>
-                <p class="missing-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey", target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
-                <input type="text" class="missing-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
-                <button class="missing-api-key-error-button" onclick="replaceApiKey();">Submit key</button>
+        <div class="missing-google-api-key-error" hidden onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="missing-google-api-key-error-box">
+                <h1 class="missing-google-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-google-api-key-error-text">The GOOGLE_API_KEY is undefined go to <a href="https://aistudio.google.com/u/1/apikey", target="_blank">Google AI Studio</a>, Sign Up and login then create your GOOGLE_API_KEY and insert it below: </p>
+                <input type="text" class="missing-google-api-key-error-input-box" placeholder="Your GOOGLE_API_KEY">
+                <button class="missing-google-api-key-error-button" onclick="replaceGoogleApiKey();">Submit key</button>
+            </div>
+        </div>
+
+        <div class="missing-openai-api-key-error" hidden onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="missing-openai-api-key-error-box">
+                <h1 class="missing-openai-api-key-error-heading">There is an error in your code</h1>
+                <p class="missing-openai-api-key-error-text">The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys", target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: </p>
+                <input type="text" class="missing-openai-api-key-error-input-box" placeholder="Your OPENAI_API_KEY">
+                <button class="missing-openai-api-key-error-button" onclick="replaceOpenAiApiKey();">Submit key</button>
+            </div>
+        </div>
+
+        <div class="account-settings" onclick="if(event.target === this) { this.hidden = true; }">
+            <div class="account-settings-sidebar">
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = false; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Account</button>
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = false; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Change theme colors</button>                
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = false; document.querySelector('.account-settings-feedback-panel').hidden = true;">AI Models</button>
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = false;">Feedback</button>
+            </div>
+            
+            <div class="account-settings-default-panel">
+                <h1>Click on a section to the left to change the corresponding settings</h1>
+            </div>
+
+            <div class="account-settings-account-panel" hidden>
+                <h1>Account</h1>
+                <input type="text" class="account-settings-account-panel-username-input" placeholder="Username">
+                <input type="text" class="account-settings-account-panel-password-input" placeholder="Password">
+                <button class="account-settings-account-panel-button" onclick="updateAccountSettings();">Update</button>
+            </div>
+
+            <div class="account-settings-theme-panel" hidden>
+                <h1>Theme</h1>
+                <p>Create your theme</p>
+                
+                <div class="theme-color-grid">
+                    <!-- Left column -->
+                    <div class="theme-color-column">
+                        <div class="theme-color-row">
+                            <input type="color" name="foreground-color" id="foreground-color" class="theme-color-input">
+                            <label for="foreground-color" class="theme-color-label">Text Color</label>
+                        </div>
+                        <div class="theme-color-row">
+                            <input type="color" name="background-color" id="background-color" class="theme-color-input">
+                            <label for="background-color" class="theme-color-label">Background Color</label>
+                        </div>
+                        <div class="theme-color-row">
+                            <input type="color" name="navbar-color" id="navbar-color" class="theme-color-input">
+                            <label for="navbar-color" class="theme-color-label">Navbar Color</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column -->
+                    <div class="theme-color-column">
+                        <div class="theme-color-row">
+                            <input type="color" name="light-shaded-color" id="light-shaded-color" class="theme-color-input">
+                            <label for="light-shaded-color" class="theme-color-label">Light Shaded Color</label>
+                        </div>
+                        <div class="theme-color-row">
+                            <input type="color" name="shaded-color" id="shaded-color" class="theme-color-input">
+                            <label for="shaded-color" class="theme-color-label">Shaded Color</label>
+                        </div>
+                        <div class="theme-color-row">
+                            <input type="color" name="dark-shaded-color" id="dark-shaded-color" class="theme-color-input">
+                            <label for="dark-shaded-color" class="theme-color-label">Dark Shaded Color</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="account-settings-theme-panel-create-theme-button" onclick="createTheme();">Create Theme</button>
+                <p class="preset-theme-color-option">Or choose between:</p>
+                <input type="radio" name="theme" id="light" class="preset-theme-color-radio">
+                <label for="light" class="preset-theme-color-label">Light</label>
+                <input type="radio" name="theme" id="dark" class="preset-theme-color-radio">
+                <label for="dark" class="preset-theme-color-label">Dark</label>
+                <button class="account-settings-theme-panel-apply-theme-button" onclick="applyTheme();">Apply Theme</button>
+            </div>
+            
+            <div class="account-settings-ai-models-panel" hidden>
+                <h1>AI Models</h1>
+                <input type="radio" name="ai-model" id="gpt-4o">
+                <label for="gpt-4o">GPT-4o</label>
+                <input type="radio" name="ai-model" id="gpt-4o-mini">
+                <label for="gpt-4o-mini">GPT-4o Mini</label>
+                <input type="radio" name="ai-model" id="gpt-3.5-turbo">
+                <label for="gpt-3.5-turbo">GPT-3.5 Turbo</label>
+                
+            </div>
+
+            <div class="account-settings-feedback-panel" hidden>
+                <h1>Feedback</h1>
             </div>
         </div>
 
         <nav class="navbar">
             <img class="navbar-logo" src="./resources/favicon.ico">
-            <h1 class="navbar-title">UltraGPT <p class="creds">By <a href="https://github.com/raedhashmi/UltraGPT" target='_blank'>raedhashmi</a></p></h1>
-            <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+            <h1 class="navbar-title">UltraGPT</h1>
+            <img class="delete-chat-icon" hidden src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+            <button class="account-button" hidden onclick="document.querySelector('.account-settings').toggleAttribute('hidden');"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z"></path></svg></button>
         </nav>
 
         <div class="chat-area">

@@ -67,12 +67,203 @@ body {
     text-decoration: underline;
 }
 
+.account-button {
+    position: absolute;
+    top: 21px;
+    right: 16px;
+    background-color: transparent;
+    color: var(--shaded-color);
+    border-radius: 9px;
+    border: none;
+}
+
+.account-button svg {
+    width: 40px;
+    height: 40px;
+}
+
+.account-button:hover {
+    cursor: pointer;
+}
+
+.account-settings-sidebar {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    background-color: var(--shaded-color);
+    color: var(--foreground-color);
+    display: flex;
+    flex-direction: column;
+    height: 46%;
+    width: 12%;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 9px;
+    border: none;
+}
+
+.account-settings-sidebar-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    padding: 8px;
+    font-size: 18px;
+    border-radius: 9px;
+    border: none;
+}
+
+.account-settings-sidebar-button:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.account-settings-account-panel, .account-settings-theme-panel, .account-settings-ai-models-panel, .account-settings-feedback-panel, .account-settings-default-panel {
+    position: absolute;
+    top: 50%;
+    left: 59%;
+    padding: 10px;
+    transform: translate(-50%, -50%);
+    background-color: var(--shaded-color);
+    color: var(--foreground-color);
+    font-size: 15px;
+    width: 50%;
+    height: 46%;
+    border-radius: 9px;
+    border: none;
+}
+
+.theme-color-grid {
+    display: flex;
+    gap: 40px;
+    margin: 20px 0;
+}
+
+.theme-color-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.theme-color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-color-input {
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border-radius: 2px;
+    border: none;
+    padding: 2px;
+}
+
+.theme-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 9px;
+    padding: 0;
+}
+
+.theme-color-input::-webkit-color-swatch-wrapper {
+    border: none;
+    border-radius: 9px;
+    padding: 0;
+}
+
+.theme-color-input:focus {
+    outline: none;
+}
+
+.theme-color-label {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.account-settings-theme-panel-create-theme-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    padding: 8px;
+    font-size: 18px;
+    width: 50%;
+    margin-top: -5px;
+    border-radius: 9px;
+    border: none;
+}
+
+.preset-theme-color-option { 
+    position: relative;
+    top: -32.2vh;
+    margin-left: 72vh;
+    font-weight: 500;
+}
+
+.preset-theme-color-radio {
+    position: relative;
+    top: -33.2vh;
+    margin-left: 72vh;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.preset-theme-color-radio:active {
+    transform: scale(0.9);
+}
+
+.preset-theme-color-label {
+    position: relative;
+    top: -36vh;
+    margin-left: 75vh;
+    margin-bottom: 0px;
+    font-weight: 500;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.account-settings-theme-panel-apply-theme-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    padding: 8px;
+    margin-left: 72vh;
+    font-size: 18px;
+    width: 32%;
+    position: relative;
+    top: -26.5vh;
+    border-radius: 9px;
+    border: none;
+}
+
 .chat-area {
     margin: 0px;
     margin-top: 5px;
     border-radius: 9px;
     max-height: 64vh;
     overflow-y: auto;
+}
+
+
+.model-warning {
+    background-color: var(--shaded-color);
+    color: var(--foreground-color);
+    padding: 4px;
+    font-size: 8px;
+    position: relative;
+    font-weight: medium;
+    left: 50%;
+    transform: translate(-50%);
+    margin-top: 6px;
+    border-radius: 9px;
+    text-align: center;
+    width: 28%;
+    height: 30%;
+}
+
+.model-warning p {
+    font-size: 12px;
+    font-weight: 400;
 }
 
 .chat-output-box {
@@ -208,7 +399,7 @@ body {
     width: 50px;
 }
 
-.delete-chat-popup, .missing-api-key-error {
+.delete-chat-popup, .missing-google-api-key-error, .missing-openai-api-key-error, .account-settings {
     position: absolute;
     z-index: 50;
     top: 50%;
@@ -287,7 +478,7 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-.missing-api-key-error-box {
+.missing-google-api-key-error-box, .missing-openai-api-key-error-box {
     background-color: var(--shaded-color);
     color: var(--foreground-color);
     padding: 4px;
@@ -301,30 +492,30 @@ body {
     border-radius: 9px;
 }
 
-.missing-api-key-error-heading {
+.missing-google-api-key-error-heading, .missing-openai-api-key-error-heading {
     font-size: 30px;
     font-weight: 600;
     margin-bottom: 12px;
     margin-left: 16px;
 }
 
-.missing-api-key-error-text {
+.missing-google-api-key-error-text, .missing-openai-api-key-error-text {
     font-size: 16px;
     font-weight: 400;
     margin-left: 18px;
 }
 
-.missing-api-key-error-text a {
+.missing-google-api-key-error-text a, .missing-openai-api-key-error-text a {
     font-weight: 600;
     text-decoration: none;
     color: var(--light-shaded-color);
 }
 
-.missing-api-key-error-text a:hover {
+.missing-google-api-key-error-text a:hover, .missing-openai-api-key-error-text a:hover {
     cursor: pointer;
 }
 
-.missing-api-key-error-input-box {
+.missing-google-api-key-error-input-box, .missing-openai-api-key-error-input-box {
     background-color: var(--background-color);
     color: var(--foreground-color);
     padding: 8px;
@@ -334,11 +525,11 @@ body {
     border: none;
 }
 
-.missing-api-key-error-input-box:focus {
+.missing-google-api-key-error-input-box:focus, .missing-openai-api-key-error-input-box:focus {
     outline: none;
 }
 
-.missing-api-key-error-button {
+.missing-google-api-key-error-button, .missing-openai-api-key-error-button {
     background-color: var(--light-shaded-color);
     color: var(--foreground-color);
     width: 71.8vw;
@@ -350,7 +541,7 @@ body {
     margin-top: 20px;
 }
 
-.missing-api-key-error-button:hover {
+.missing-google-api-key-error-button:hover, .missing-openai-api-key-error-button:hover {
     cursor: pointer;
     scale: 1.02;
     transition: all 0.2s ease-in-out;
@@ -437,27 +628,6 @@ body {
     margin-bottom: 12px;
     margin-left: 8px;
     border-radius: 9px;
-}
-
-.model-warning {
-    background-color: var(--shaded-color);
-    color: var(--foreground-color);
-    padding: 4px;
-    font-size: 8px;
-    position: relative;
-    font-weight: medium;
-    left: 50%;
-    transform: translate(-50%);
-    margin-top: 6px;
-    border-radius: 9px;
-    text-align: center;
-    width: 28%;
-    height: 30%;
-}
-
-.model-warning p {
-    font-size: 12px;
-    font-weight: 400;
 }
 
 @keyframes expand {

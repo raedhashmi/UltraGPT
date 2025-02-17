@@ -46,7 +46,7 @@ def AI(prompt: str, loggedIn: str) :
             ]
         )
         response = completion.choices[0].message
-        return response
+        return response.content
     else:
         response = converstaion_chain.run({"input": prompt})
         return response
