@@ -43,6 +43,9 @@ function signUp() {
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
 
+    localStorage.setItem('currentUsername', username.value);
+    localStorage.setItem('currentPassword', password.value);
+
     // Show success animation and redirect
     errorbox.hidden = true;
     console.log("User created successfully");

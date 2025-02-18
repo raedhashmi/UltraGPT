@@ -38,10 +38,10 @@
 
         <div class="account-settings" hidden onclick="if(event.target === this) { this.hidden = true; }">
             <div class="account-settings-sidebar">
-                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = false; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Account</button>
-                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = false; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = true;">Change theme colors</button>                
-                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = false; document.querySelector('.account-settings-feedback-panel').hidden = true;">AI Models</button>
-                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-feedback-panel').hidden = false;">Feedback</button>
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = false; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">Account</button>
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = false; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">Change theme colors</button>                
+                <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = false; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">AI Models</button>
+                <button class="account-settings-sidebar-button" style="background-color: #aa0000;" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = false;">Danger Zone</button>
             </div>
             
             <div class="account-settings-default-panel">
@@ -51,7 +51,9 @@
             <div class="account-settings-account-panel" hidden>
                 <h1>Account</h1>
                 <input type="text" class="account-settings-account-panel-username-input" placeholder="Username">
+                <br>
                 <input type="text" class="account-settings-account-panel-password-input" placeholder="Password">
+                <br>
                 <button class="account-settings-account-panel-button" onclick="updateAccountSettings();">Update</button>
             </div>
 
@@ -60,7 +62,6 @@
                 <p>Create your theme</p>
                 
                 <div class="theme-color-grid">
-                    <!-- Left column -->
                     <div class="theme-color-column">
                         <div class="theme-color-row">
                             <input type="color" name="foreground-color" id="foreground-color" class="theme-color-input">
@@ -71,12 +72,14 @@
                             <label for="background-color" class="theme-color-label">Background Color</label>
                         </div>
                         <div class="theme-color-row">
-                            <input type="color" name="navbar-color" id="navbar-color" class="theme-color-input">
-                            <label for="navbar-color" class="theme-color-label">Navbar Color</label>
+                            <div class="gradient-inputs">
+                                <input type="color" name="navbar-color-start" id="navbar-color-start" class="theme-color-input">
+                                <input type="color" name="navbar-color-end" id="navbar-color-end" class="theme-color-input">
+                            </div>
+                            <label for="navbar-color-start" class="theme-color-label">Navbar Gradient</label>
                         </div>
                     </div>
                     
-                    <!-- Right column -->
                     <div class="theme-color-column">
                         <div class="theme-color-row">
                             <input type="color" name="light-shaded-color" id="light-shaded-color" class="theme-color-input">
@@ -95,11 +98,12 @@
 
                 <button class="account-settings-theme-panel-create-theme-button" onclick="createTheme();">Create Theme</button>
                 <p class="preset-theme-color-option">Or choose between:</p>
-                <input type="radio" name="theme" id="light" class="preset-theme-color-radio">
+                <input type="radio" name="theme" id="light" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'light'); applyTheme(); window.location.reload();">
                 <label for="light" class="preset-theme-color-label">Light</label>
-                <input type="radio" name="theme" id="dark" class="preset-theme-color-radio">
+                <input type="radio" name="theme" id="dark" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'dark'); applyTheme(); window.location.reload();">
                 <label for="dark" class="preset-theme-color-label">Dark</label>
-                <button class="account-settings-theme-panel-apply-theme-button" onclick="applyTheme();">Apply Theme</button>
+                <input type="radio" class="preset-theme-color-radio" name="theme" id="system" onclick="localStorage.setItem('theme', 'system'); applyTheme(); window.location.reload();">
+                <label for="system" class="preset-theme-color-label">System</label>
             </div>
             
             <div class="account-settings-ai-models-panel" hidden>
@@ -109,12 +113,18 @@
                 <input type="radio" name="ai-model" id="gpt-4o-mini">
                 <label for="gpt-4o-mini">GPT-4o Mini</label>
                 <input type="radio" name="ai-model" id="gpt-3.5-turbo">
-                <label for="gpt-3.5-turbo">GPT-3.5 Turbo</label>
-                
+                <label for="gpt-3.5-turbo">GPT-3.5 Turbo</label>  
             </div>
 
-            <div class="account-settings-feedback-panel" hidden>
-                <h1>Feedback</h1>
+            <div class="account-settings-danger-zone-panel" hidden>
+                <h1>Danger Zone</h1>
+                <button class="account-settings-danger-zone-panel-button" onclick="document.querySelector('.delete-chat-popup').hidden = false;">Delete Chat</button>
+                <br>
+                <button class="account-settings-danger-zone-panel-button" onclick="localStorage.removeItem('nav-start-color'); localStorage.removeItem('nav-end-color'); localStorage.removeItem('shaded-color'); localStorage.removeItem('dark-shaded-color'); localStorage.removeItem('light-shaded-color'); localStorage.removeItem('foreground-color'); localStorage.removeItem('background-color'); localStorage.setItem('theme', 'system'); window.location.reload();">Reset Settings</button>
+                <br>
+                <button class="account-settings-danger-zone-panel-button" onclick="localStorage.clear(); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click(); document.getElementById('system').click(); window.location.href = '/';">Delete Account</button>
+                <br>
+                <p>*These actions cannot be undone</p>
             </div>
         </div>
 

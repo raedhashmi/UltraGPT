@@ -36,17 +36,18 @@ if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.s
     console.error("OPENAI_API_KEY is incorrect");
 }
 
-const navColor = getComputedStyle(document.querySelector('.navbar')).getPropertyValue('--nav-color').trim();
-if (navColor == "#994700") {
-    localStorage.setItem('darkMode', "false");
-} else if (navColor == "#381a00") {
-    localStorage.setItem('darkMode', "true");
-}
+const foregroundColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--foreground-color').trim();
+const backgroundColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--background-color').trim();
+const shadedColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--shaded-color').trim();
+const darkShadedColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--dark-shaded-color').trim();
+const lightShadedColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--light-shaded-color').trim();
+const navStartColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color').trim().replace('linear-gradient(to right, ', '').replace(')', '').split(',')[0].trim();
+const navEndColor = getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color').trim().replace('linear-gradient(to right, ', '').replace(')', '').split(',')[1].trim();
 
-if (localStorage.getItem('darkMode') == "true") {
-    document.querySelector('.attach-file-img').src = './resources/attachFileDark.png';
-} else if (localStorage.getItem('darkMode') == "false") {
+if (localStorage.getItem('theme') == "light") {
     document.querySelector('.attach-file-img').src = './resources/attachFileLight.png';
+} else if (localStorage.getItem('theme') == "dark") {
+    document.querySelector('.attach-file-img').src = './resources/attachFileDark.png';
 }
 
 if (localStorage.getItem('loggedIn') == 'true') {
@@ -59,26 +60,183 @@ if (localStorage.getItem('loggedIn') == 'true') {
     document.querySelector('.account-button').hidden = true;
 }
 
-if (localStorage.getItem('navbar-color') == null) {
-    document.getElementById('navbar-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color').trim();
-} else if (localStorage.getItem('navbar-color') != null) {
-    document.getElementById('navbar-color').value = localStorage.getItem('navbar-color');
-} else if (localStorage.getItem('shaded-color') == null) {
-    document.getElementById('shaded-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--light-shaded-color').trim();
-} else if (localStorage.getItem('shaded-color') != null) {
-    document.getElementById('shaded-color').value = localStorage.getItem('shaded-color');
-} else if (localStorage.getItem('dark-shaded-color') == null) {
-    document.getElementById('dark-shaded-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--dark-shaded-color').trim();
-} else if (localStorage.getItem('dark-shaded-color') != null) {
-    document.getElementById('dark-shaded-color').value = localStorage.getItem('dark-shaded-color');
-} else if (localStorage.getItem('foreground-color') == null) {
-    document.getElementById('foreground-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--foreground-color').trim();
-} else if (localStorage.getItem('foreground-color') != null) {
+document.querySelector('.account-settings-account-panel-username-input').value = localStorage.getItem('currentUsername');
+document.querySelector('.account-settings-account-panel-password-input').value = localStorage.getItem('currentPassword');
+
+if (localStorage.getItem('theme') == 'light') {
+    document.getElementById('light').checked = true;
+} else if (localStorage.getItem('theme') == 'dark') {
+    document.getElementById('dark').checked = true;
+} else if (localStorage.getItem('theme') == 'system') {
+    document.getElementById('system').checked = true;
+}
+
+if (localStorage.getItem('theme') != 'system') {
+    const cssVariables = {
+        '--nav-color': `linear-gradient(to right, ${localStorage.getItem('nav-start-color')}, ${localStorage.getItem('nav-end-color')})`,
+        '--shaded-color': localStorage.getItem('shaded-color'),
+        '--dark-shaded-color': localStorage.getItem('dark-shaded-color'),
+        '--light-shaded-color': localStorage.getItem('light-shaded-color'),
+        '--foreground-color': localStorage.getItem('foreground-color'),
+        '--background-color': localStorage.getItem('background-color')
+    };
+
+    Object.entries(cssVariables).forEach(([property, value]) => {
+        document.documentElement.style.setProperty(property, value);
+    });
+}
+
+if (localStorage.getItem('theme') == 'system') {
+    document.getElementById('navbar-color-start').value = navStartColor;
+    document.getElementById('navbar-color-end').value = navEndColor;
+    document.getElementById('foreground-color').value = foregroundColor;
+    document.getElementById('background-color').value = backgroundColor;
+    document.getElementById('shaded-color').value = shadedColor;
+    document.getElementById('dark-shaded-color').value = darkShadedColor;
+    document.getElementById('light-shaded-color').value = lightShadedColor;
+} else {
+    document.getElementById('navbar-color-start').value = localStorage.getItem('nav-start-color');
+    document.getElementById('navbar-color-end').value = localStorage.getItem('nav-end-color');
     document.getElementById('foreground-color').value = localStorage.getItem('foreground-color');
-} else if (localStorage.getItem('background-color') == null) {
-    document.getElementById('background-color').value = getComputedStyle(document.querySelector('html')).getPropertyValue('--background-color').trim();
-} else if (localStorage.getItem('background-color') != null) {
     document.getElementById('background-color').value = localStorage.getItem('background-color');
+    
+}
+
+function createTheme() {
+    localStorage.setItem('nav-start-color', document.getElementById('navbar-color-start').value);
+    localStorage.setItem('nav-end-color', document.getElementById('navbar-color-end').value);
+    localStorage.setItem('shaded-color', document.getElementById('shaded-color').value);
+    localStorage.setItem('dark-shaded-color', document.getElementById('dark-shaded-color').value);
+    localStorage.setItem('light-shaded-color', document.getElementById('light-shaded-color').value);
+    localStorage.setItem('foreground-color', document.getElementById('foreground-color').value);
+    localStorage.setItem('background-color', document.getElementById('background-color').value);
+
+    const navStartColorInput = document.getElementById('navbar-color-start').value;
+    const navEndColorInput = document.getElementById('navbar-color-end').value;
+    const shadedColorInput = document.getElementById('shaded-color').value;
+    const darkShadedColorInput = document.getElementById('dark-shaded-color').value;
+    const lightShadedColorInput = document.getElementById('light-shaded-color').value;
+    const foregroundColorInput = document.getElementById('foreground-color').value;
+    const backgroundColorInput = document.getElementById('background-color').value;
+
+    const cssVariables = {
+        '--nav-color': `linear-gradient(to right, ${navStartColorInput}, ${navEndColorInput})`,
+        '--shaded-color': shadedColorInput,
+        '--dark-shaded-color': darkShadedColorInput, 
+        '--light-shaded-color': lightShadedColorInput,
+        '--foreground-color': foregroundColorInput,
+        '--background-color': backgroundColorInput,
+    };
+
+    Object.entries(cssVariables).forEach(([property, value]) => {
+        document.documentElement.style.setProperty(property, value);
+    });
+}
+
+function applyTheme() {
+    if (document.getElementById('light').checked) {
+        // Light theme preset values
+        localStorage.setItem('nav-start-color', '#994700');
+        localStorage.setItem('nav-end-color', '#3a1b00');
+        localStorage.setItem('shaded-color', '#cecece');
+        localStorage.setItem('dark-shaded-color', '#6a6a6a');
+        localStorage.setItem('light-shaded-color', '#dfdfdf');
+        localStorage.setItem('foreground-color', '#000000');
+        localStorage.setItem('background-color', '#ffffff');
+        localStorage.setItem('theme', 'light');
+    } else if (document.getElementById('dark').checked) {
+        // Dark theme preset values
+        localStorage.setItem('nav-start-color', '#8f4300');
+        localStorage.setItem('nav-end-color', '#381a00');
+        localStorage.setItem('shaded-color', '#0c0c0c');
+        localStorage.setItem('dark-shaded-color', '#080808');
+        localStorage.setItem('light-shaded-color', '#2f2f2f');
+        localStorage.setItem('foreground-color', '#ffffff');
+        localStorage.setItem('background-color', '#000000');
+        localStorage.setItem('theme', 'dark');
+    } else if (document.getElementById('system').checked) {
+        // System theme preset values
+        localStorage.setItem('nav-start-color', navStartColor);
+        localStorage.setItem('nav-end-color', navEndColor);
+        localStorage.setItem('shaded-color', shadedColor);
+        localStorage.setItem('dark-shaded-color', darkShadedColor);
+        localStorage.setItem('light-shaded-color', lightShadedColor);
+        localStorage.setItem('foreground-color', foregroundColor);
+        localStorage.setItem('background-color', backgroundColor);
+        localStorage.setItem('theme', 'system');
+    }
+
+    if (localStorage.getItem('theme') != 'system') {
+        const cssVariables = {
+            '--nav-color': `linear-gradient(to right, ${localStorage.getItem('nav-start-color')}, ${localStorage.getItem('nav-end-color')})`,
+            '--shaded-color': localStorage.getItem('shaded-color'),
+            '--dark-shaded-color': localStorage.getItem('dark-shaded-color'),
+            '--light-shaded-color': localStorage.getItem('light-shaded-color'),
+            '--foreground-color': localStorage.getItem('foreground-color'),
+            '--background-color': localStorage.getItem('background-color')
+        };
+    
+        Object.entries(cssVariables).forEach(([property, value]) => {
+            document.documentElement.style.setProperty(property, value);
+        });
+    } else {
+        if (getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color') == 'linear-gradient(to right, #994700, #3a1b00)') {
+            localStorage.removeItem('nav-start-color');
+            localStorage.removeItem('nav-end-color');
+        } else if (getComputedStyle(document.querySelector('html')).getPropertyValue('--nav-color') == 'linear-gradient(to right, #8f4300, #381a00)') {
+            localStorage.removeItem('nav-start-color');
+            localStorage.removeItem('nav-end-color');
+        }
+        localStorage.removeItem('shaded-color');
+        localStorage.removeItem('dark-shaded-color');
+        localStorage.removeItem('light-shaded-color');
+        localStorage.removeItem('foreground-color');
+        localStorage.removeItem('background-color');
+    }
+}
+
+
+function updateAccountSettings() {
+    const oldUsername = localStorage.getItem('currentUsername');
+    const oldPassword = localStorage.getItem('currentPassword');
+
+    const newUsername = document.querySelector('.account-settings-account-panel-username-input').value;
+    const newPassword = document.querySelector('.account-settings-account-panel-password-input').value;
+
+    if (!newUsername || !newPassword) {
+        console.error('New username or password is empty');
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Check if new username already exists for a different user
+    const usernameExists = users.some(user => 
+        user.username === newUsername && 
+        user.username !== oldUsername
+    );
+
+    if (usernameExists) {
+        console.error('Username already taken');
+        return;
+    }
+
+    const userIndex = users.findIndex(user => 
+        user.username === oldUsername && 
+        user.password === oldPassword
+    );
+
+    if (userIndex !== -1) {
+        users[userIndex].username = newUsername;
+        users[userIndex].password = newPassword;
+        
+        localStorage.setItem('currentUsername', newUsername);
+        localStorage.setItem('currentPassword', newPassword);
+        localStorage.setItem('users', JSON.stringify(users));
+        console.log('Account settings updated successfully');
+    } else {
+        console.error('Current user not found');
+    }
 }
 
 function newMsgString(response) {
