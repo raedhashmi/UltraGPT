@@ -9,7 +9,7 @@
 </head>
 <body onload="checkChatURL(); document.querySelector('.chat-area').scrollTo({top: document.querySelector('.chat-area').scrollHeight, behavior: 'instant'});">
     <main>
-        <div class="delete-chat-popup" hidden onclick="if(event.target === this) { this.hidden = true; }">
+        <div class="delete-chat-popup" hidden style="z-index: 100;" onclick="if(event.target === this) { this.hidden = true; }">
             <div class="delete-chat-popup-box">
                 <p class="delete-chat-popup-heading">Are you sure you want to delete this chat?</p>
                 <p class="delete-chat-popup-description">This action cannot be undone</p>
@@ -98,11 +98,11 @@
 
                 <button class="account-settings-theme-panel-create-theme-button" onclick="createTheme();">Create Theme</button>
                 <p class="preset-theme-color-option">Or choose between:</p>
-                <input type="radio" name="theme" id="light" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'light'); applyTheme(); window.location.reload();">
+                <input type="radio" name="theme" id="light" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'light'); applyTheme();">
                 <label for="light" class="preset-theme-color-label">Light</label>
-                <input type="radio" name="theme" id="dark" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'dark'); applyTheme(); window.location.reload();">
+                <input type="radio" name="theme" id="dark" class="preset-theme-color-radio" onclick="localStorage.setItem('theme', 'dark'); applyTheme();">
                 <label for="dark" class="preset-theme-color-label">Dark</label>
-                <input type="radio" class="preset-theme-color-radio" name="theme" id="system" onclick="localStorage.setItem('theme', 'system'); applyTheme(); window.location.reload();">
+                <input type="radio" class="preset-theme-color-radio" name="theme" id="system" onclick="localStorage.setItem('theme', 'system'); applyTheme();">
                 <label for="system" class="preset-theme-color-label">System</label>
             </div>
             
@@ -122,7 +122,7 @@
                 <br>
                 <button class="account-settings-danger-zone-panel-button" onclick="localStorage.removeItem('nav-start-color'); localStorage.removeItem('nav-end-color'); localStorage.removeItem('shaded-color'); localStorage.removeItem('dark-shaded-color'); localStorage.removeItem('light-shaded-color'); localStorage.removeItem('foreground-color'); localStorage.removeItem('background-color'); localStorage.setItem('theme', 'system'); window.location.reload();">Reset Settings</button>
                 <br>
-                <button class="account-settings-danger-zone-panel-button" onclick="localStorage.clear(); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click(); document.getElementById('system').click(); window.location.href = '/';">Delete Account</button>
+                <button class="account-settings-danger-zone-panel-button" onclick="localStorage.clear(); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click(); document.getElementById('system').click(); localStorage.setItem('loggedIn', 'false'); window.location.href = '/';">Delete Account</button>
                 <br>
                 <p>*These actions cannot be undone</p>
             </div>

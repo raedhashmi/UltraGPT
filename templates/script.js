@@ -55,6 +55,7 @@ if (localStorage.getItem('loggedIn') == 'true') {
     document.querySelector('.delete-chat-icon').hidden = true;
     document.querySelector('.account-button').hidden = false;
 } else if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
+    localStorage.setItem('theme', 'system');
     document.querySelector('.model-warning').hidden = false;
     document.querySelector('.delete-chat-icon').hidden = false;
     document.querySelector('.account-button').hidden = true;
@@ -97,6 +98,9 @@ if (localStorage.getItem('theme') == 'system') {
 } else {
     document.getElementById('navbar-color-start').value = localStorage.getItem('nav-start-color');
     document.getElementById('navbar-color-end').value = localStorage.getItem('nav-end-color');
+    document.getElementById('shaded-color').value = localStorage.getItem('shaded-color');
+    document.getElementById('dark-shaded-color').value = localStorage.getItem('dark-shaded-color');
+    document.getElementById('light-shaded-color').value = localStorage.getItem('light-shaded-color');
     document.getElementById('foreground-color').value = localStorage.getItem('foreground-color');
     document.getElementById('background-color').value = localStorage.getItem('background-color');
     
@@ -282,7 +286,7 @@ async function sendMessage() {
     if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
-    if (localStorage.getItem('loggedIn') == 'false') {
+    if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
         if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || GOOGLE_API_KEY.length != 39) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
