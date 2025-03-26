@@ -46,13 +46,13 @@ client = OpenAI(
     api_key=OPENAI_API_KEY
 )
 
-def AI(prompt: str, loggedIn: str):
+def AI(prompt: str, loggedIn: str, ai_model: str = "gpt-4o-mini"):
     if prompt == 'delete chat':
         memory.clear()
         openai_memory.clear()
     elif loggedIn == 'true': 
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=ai_model,
             messages=[
                 {"role": "user", "content": prompt},
                 *openai_memory.chat_history,  # Use OpenAI-specific memory

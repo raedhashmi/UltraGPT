@@ -67,6 +67,107 @@ body {
     text-decoration: underline;
 }
 
+.sign-up-btn {
+    background-color: var(--light-shaded-color);
+    color: white;
+    padding: 8px;
+    font-size: 18px;
+    margin-top: -38px;
+    z-index: 100;
+    float: right;
+    margin-right: 72px;
+    width: fit-content;
+    border: none;
+    border-radius: 9px;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.sign-up-btn:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.sign-up-btn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.sign-up-btn:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.sign-up-btn:active {
+    transform: scale(0.98);
+}
+
+.sign-up-btn:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+.login-btn {
+    background-color: var(--light-shaded-color);
+    color: white;
+    padding: 8px;
+    font-size: 18px;
+    margin-top: -38px;
+    z-index: 100;
+    float: right;
+    width: fit-content;
+    border: none;
+    border-radius: 9px;
+    position: relative;
+    transition: all 0.2s ;
+}
+
+.login-btn:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.login-btn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.login-btn:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+.login-btn:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
 .account-button {
     position: absolute;
     top: 21px;
@@ -77,13 +178,45 @@ body {
     border: none;
 }
 
+.account-button:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.account-button::after {
+    content: '';
+    position: absolute;
+    margin-top: -2.4px;
+    inset: 0px 1px;
+    border: 2px solid var(--shaded-color);
+    border-radius: 100%;
+    opacity: 0;
+}
+
+.account-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.account-button:active {
+    transform: scale(0.98);
+}
+
+.account-button:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 100%;
+}
+
 .account-button svg {
     width: 40px;
     height: 40px;
-}
-
-.account-button:hover {
-    cursor: pointer;
 }
 
 .account-settings-sidebar {
@@ -103,19 +236,59 @@ body {
     border: none;
 }
 
-.account-settings-sidebar-button {
+.account-settings-sidebar-button, .account-settings-danger-zone-sidebar-button {
     background-color: var(--light-shaded-color);
     color: var(--foreground-color);
     padding: 8px;
     font-size: 18px;
     border-radius: 9px;
     border: none;
+    position: relative;
+    transition: all 0.2s ;
 }
 
-.account-settings-sidebar-button:hover {
+.account-settings-sidebar-button:hover, .account-settings-danger-zone-sidebar-button:hover {
     cursor: pointer;
     scale: 1.1;
     transition: all 0.2s ease-in-out;
+}
+
+.account-settings-sidebar-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.account-settings-danger-zone-sidebar-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #aa0000;
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.account-settings-sidebar-button:hover::after, .account-settings-danger-zone-sidebar-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.account-settings-sidebar-button:active, .account-settings-danger-zone-sidebar-button:active {
+    transform: scale(0.98);
+}
+
+.account-settings-sidebar-button:active::before, .account-settings-danger-zone-sidebar-button:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
 }
 
 .account-settings-account-panel, .account-settings-theme-panel, .account-settings-ai-models-panel, .account-settings-danger-zone-panel, .account-settings-default-panel {
@@ -218,19 +391,69 @@ body {
     margin-top: -5px;
     border-radius: 9px;
     border: none;
+    position: relative;
+    transition: all 0.2s ;
+}
+
+.account-settings-theme-panel-apply-theme-button {
+    background-color: var(--light-shaded-color);
+    color: var(--foreground-color);
+    padding: 8px;
+    font-size: 18px;
+    width: 50%;
+    margin-top: 10px;
+    border-radius: 9px;
+    border: none;
+    position: relative;
+    transition: all 0.2s ;
+}
+
+.account-settings-theme-panel-create-theme-button:hover {
+    cursor: pointer;
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+}
+
+.account-settings-theme-panel-create-theme-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.account-settings-theme-panel-create-theme-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.account-settings-theme-panel-create-theme-button:active {
+    transform: scale(0.98);
+}
+
+.account-settings-theme-panel-create-theme-button:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
 }
 
 .preset-theme-color-option { 
     position: relative;
-    top: -32.2vh;
-    margin-left: 79vh;
+    top: -73%;
+    margin-left: 76%;
     font-weight: 500;
 }
 
 .preset-theme-color-radio {
     position: relative;
-    top: -33.2vh;
-    margin-left: 79vh;
+    top: -76%;
+    margin-left: 76%;
     vertical-align: middle;
     transition: transform 0.2s ease;
     cursor: pointer;
@@ -240,14 +463,43 @@ body {
     transform: scale(0.9);
 }
 
+.preset-theme-color-radio:checked {
+    accent-color: var(--light-shaded-color);
+    outline: none;
+}
+
 .preset-theme-color-label {
     position: relative;
-    top: -36vh;
-    margin-left: 82vh;
+    top: -82%;
+    margin-left: 78.7%;
     margin-bottom: 0px;
     font-weight: 500;
     display: inline-block;
     vertical-align: middle;
+}
+
+.ai-model-radio {
+    display: block;
+    margin: 4px 0;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    accent-color: var(--light-shaded-color);
+}
+
+.ai-model-radio:active {
+    transform: scale(0.9);
+}
+
+.ai-model-radio:checked {
+    accent-color: var(--light-shaded-color);
+}
+
+.ai-model-label {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 18px;
+    position: relative;
+    top: -22px;
 }
 
 .account-settings-danger-zone-panel-button {
@@ -255,16 +507,41 @@ body {
     color: #ffffff;
     padding: 8px;
     font-size: 18px;
-    width: 30vh;
+    width: 30%;
     margin-top: 8px;
     border-radius: 9px;
     border: none;
+    position: relative;
+    transition: all 0.2s ;
 }
 
-.account-settings-danger-zone-panel-button:hover {
-    cursor: pointer;
-    scale: 1.1;
-    transition: all 0.2s ease-in-out;
+.account-settings-danger-zone-panel-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #aa0000;
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.account-settings-danger-zone-panel-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.account-settings-danger-zone-panel-button:active {
+    transform: scale(0.98);
+}
+
+.account-settings-danger-zone-panel-button:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 .account-settings-danger-zone-panel p {
@@ -287,6 +564,7 @@ body {
     padding: 4px;
     font-size: 8px;
     position: relative;
+    z-index: -1;
     font-weight: medium;
     left: 50%;
     transform: translate(-50%);
@@ -355,6 +633,7 @@ body {
     position: absolute;
     inset-block-end: 13px;
     border-radius: 19px;
+    z-index: -1;
     padding: 2px;
     background-color: var(--shaded-color);
     opacity: 95%;
@@ -392,12 +671,36 @@ body {
     border-radius: 16px;
     margin-inline-start: 10px;
     padding: 10px;
+    transition: all 0.2s ;
 }
 
-.send-button:hover {
-    cursor: pointer;
-    background-color: #131313;
-    transition: all 0.2s ease-in-out;
+.send-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.send-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
+}
+
+.send-button:active {
+    transform: scale(0.98);
+}
+
+.send-button:active::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
 }
 
 .suggestions-container {
@@ -419,6 +722,22 @@ body {
     font-size: large;
     border-radius: 9px;
     border: var(--light-shaded-color) solid 2px;
+    position: relative;
+    transition: all 0.2s ;
+}
+
+.suggestion-button::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--light-shaded-color);
+    border-radius: 12px;
+    opacity: 0;
+}
+
+.suggestion-button:hover::after {
+    opacity: 1;
+    animation: borderRotate 1.5s linear infinite;
 }
 
 .suggestion-button:hover {
@@ -666,24 +985,53 @@ body {
     border-radius: 9px;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+
 @keyframes expand {
     0% {
+        z-index: 100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%) scale(1);
         background-color: var(--shaded-color);
     }
     25% {
+        z-index: 100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%) scale(100);
         background-color: var(--shaded-color);
     }
     50% {
+        z-index: 100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%) scale(100);
         background-color: var(--shaded-color);
     }
     75% {
+        z-index: 100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%) scale(100);
         background-color: var(--shaded-color);
     }
     100% {
+        z-index: 100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%) scale(1);
         background-color: var(--shaded-color);
     }
@@ -696,6 +1044,24 @@ body {
     100% {
         opacity: 0;
     }    
+}
+
+@keyframes borderRotate {
+    0% {
+        clip-path: inset(0 0 95% 0);
+    }
+    25% {
+        clip-path: inset(0 0 0 95%);
+    }
+    50% {
+        clip-path: inset(95% 0 0 0);
+    }
+    75% {
+        clip-path: inset(0 95% 0 0);
+    }
+    100% {
+        clip-path: inset(0 0 95% 0);
+    }
 }
 
 ::-webkit-scrollbar {

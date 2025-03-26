@@ -41,7 +41,7 @@
                 <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = false; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">Account</button>
                 <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = false; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">Change theme colors</button>                
                 <button class="account-settings-sidebar-button" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = false; document.querySelector('.account-settings-danger-zone-panel').hidden = true;">AI Models</button>
-                <button class="account-settings-sidebar-button" style="background-color: #aa0000;" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = false;">Danger Zone</button>
+                <button class="account-settings-danger-zone-sidebar-button" style="background-color: #aa0000;" onclick="document.querySelector('.account-settings-default-panel').hidden = true; document.querySelector('.account-settings-account-panel').hidden = true; document.querySelector('.account-settings-theme-panel').hidden = true; document.querySelector('.account-settings-ai-models-panel').hidden = true; document.querySelector('.account-settings-danger-zone-panel').hidden = false;">Danger Zone</button>
             </div>
             
             <div class="account-settings-default-panel">
@@ -108,12 +108,12 @@
             
             <div class="account-settings-ai-models-panel" hidden>
                 <h1>AI Models</h1>
-                <input type="radio" name="ai-model" id="gpt-4o">
-                <label for="gpt-4o">GPT-4o</label>
-                <input type="radio" name="ai-model" id="gpt-4o-mini">
-                <label for="gpt-4o-mini">GPT-4o Mini</label>
-                <input type="radio" name="ai-model" id="gpt-3.5-turbo">
-                <label for="gpt-3.5-turbo">GPT-3.5 Turbo</label>  
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o" onclick="localStorage.setItem('ai-model', 'gpt-4o');">
+                <label for="gpt-4o" class="ai-model-label">GPT-4o</label>
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o-mini" onclick="localStorage.setItem('ai-model', 'gpt-4o-mini');">
+                <label for="gpt-4o-mini" class="ai-model-label">GPT-4o Mini</label>
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-3.5-turbo" onclick="localStorage.setItem('ai-model', 'gpt-3.5-turbo');">
+                <label for="gpt-3.5-turbo" class="ai-model-label">GPT-3.5 Turbo</label>  
             </div>
 
             <div class="account-settings-danger-zone-panel" hidden>
@@ -131,7 +131,8 @@
         <nav class="navbar">
             <img class="navbar-logo" src="./resources/favicon.ico">
             <h1 class="navbar-title">UltraGPT <p class="creds">By <a href="https://github.com/raedhashmi/UltraGPT" target="_blank">raedhashmi</a></p></h1>
-            <img class="delete-chat-icon" hidden src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+            <button class="sign-up-btn" onclick="document.querySelector('.sign-up-btn').innerHTML = ''; document.querySelector('.sign-up-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/signUp'; }, 700);">Sign up</button>
+            <button class="login-btn" onclick="document.querySelector('.login-btn').innerHTML = ''; document.querySelector('.login-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/login'; }, 700);">Login</button>
             <button class="account-button" hidden onclick="document.querySelector('.account-settings').toggleAttribute('hidden');"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z"></path></svg></button>
         </nav>
 

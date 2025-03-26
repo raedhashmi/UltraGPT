@@ -52,12 +52,14 @@ if (localStorage.getItem('theme') == "light") {
 
 if (localStorage.getItem('loggedIn') == 'true') {
     document.querySelector('.model-warning').hidden = true;
-    document.querySelector('.delete-chat-icon').hidden = true;
+    document.querySelector('.sign-up-btn').hidden = true;
+    document.querySelector('.login-btn').hidden = true;
     document.querySelector('.account-button').hidden = false;
 } else if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
     localStorage.setItem('theme', 'system');
     document.querySelector('.model-warning').hidden = false;
-    document.querySelector('.delete-chat-icon').hidden = false;
+    document.querySelector('.sign-up-btn').hidden = false;
+    document.querySelector('.login-btn').hidden = false;
     document.querySelector('.account-button').hidden = true;
 }
 
@@ -199,7 +201,6 @@ function applyTheme() {
     }
 }
 
-
 function updateAccountSettings() {
     const oldUsername = localStorage.getItem('currentUsername');
     const oldPassword = localStorage.getItem('currentPassword');
@@ -242,6 +243,46 @@ function updateAccountSettings() {
         console.error('Current user not found');
     }
 }
+
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'r') {
+        event.preventDefault(); // Prevent the default action
+        location.reload(); // Reload the page
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'q') {
+        blackScreen = document.createElement('div');
+        blackScreen.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 100;
+            animation: fadeIn 0.6s ease-in-out;
+        `;
+        document.body.appendChild(blackScreen);
+        setTimeout(() => {
+                fetch('/closeApp', {
+                method: 'POST'
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Application closed successfully.');
+                } else {
+                    console.error('Failed to close the application.');
+                }
+            })
+            .catch(error => console.error('Error closing the application:', error));
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500)
+        }, 600)
+    }
+});
 
 function newMsgString(response) {
     if (response.includes('**')) {
@@ -287,13 +328,13 @@ async function sendMessage() {
         document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
 
     if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
+        document.querySelector('.model-warning').hidden = false;
         if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || GOOGLE_API_KEY.length != 39) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
             document.querySelector('.missing-google-api-key-error').hidden = false;
             console.error("GOOGLE_API_KEY is incorrect");
         } else {
-            document.querySelector('.model-warning').hidden = true;
             document.querySelector('.message-input').disabled = true;
             document.querySelector('.message-input').style.backgroundColor = "#282828";
             document.querySelector('.message-input').style.cursor = "not-allowed";
@@ -317,6 +358,7 @@ async function sendMessage() {
             }, 0);
         }
     } else if (localStorage.getItem('loggedIn') == 'true') {
+        document.querySelector('.model-warning').hidden = true;
         if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
             document.querySelector('.message-input').value = '';
             document.querySelector('.message-input').focus = false;
@@ -324,7 +366,6 @@ async function sendMessage() {
             document.querySelector('.missing-openai-api-key-error-text').innerHTML = 'The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys", target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: ';
             console.error("OPENAI_API_KEY is incorrect");
         } else {
-            document.querySelector('.model-warning').hidden = true;
             document.querySelector('.message-input').disabled = true;
             document.querySelector('.message-input').style.backgroundColor = "#282828";
             document.querySelector('.message-input').style.cursor = "not-allowed";
@@ -334,7 +375,7 @@ async function sendMessage() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ prompt: prompt, loggedIn: 'true' }),
+                    body: JSON.stringify({ prompt: prompt, loggedIn: 'true', ai_model: localStorage.getItem('ai-model') }),
                 }).then(res => res.text());
             document.querySelector('.message-input').disabled = false;
             document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
