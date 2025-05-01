@@ -67,14 +67,14 @@ def catch_all(path):
 
 @app.route('/closeApp', methods=['POST'])
 def close_app():
-    # window.destroy()
+    window.destroy()
     print('\033[31mClosed application!\033[37m')
     return 'success', 200
 
 if __name__ == '__main__':
-    # window = webview.create_window('UltraGPT', app, fullscreen=True, frameless=True, http_port=8000)
+    window = webview.create_window('UltraGPT', app, fullscreen=True, frameless=True, http_port=8000)
     print('\033[32mApplication Started. Press CTRL+Q in application to exit at any time!\033[0m')
     time.sleep(2)
     print('\033[2mApplication accessible at http://localhost:8000\033[0m')
-    # webview.start(http_port=8000) # This has been commmented to avoid problems with Mac Simmulation's in-built UltraGPT rendering logic. Don't know about Mac Simulation? Check out https://github.com/raedhashmi/MacSimulation
-    app.run() # This will run it in the browser instead of the webview window
+    webview.start(http_port=8000) # This has been commmented to avoid problems with Mac Simmulation's in-built UltraGPT rendering logic. Don't know about Mac Simulation? Check out https://github.com/raedhashmi/MacSimulation
+    # app.run() This will run it in the browser instead of the webview window

@@ -350,10 +350,6 @@ async function sendMessage() {
             document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
             document.querySelector('.message-input').style.cursor = "text";
 
-                if (response.startsWith("AI: ")) {
-                    response = response.substring(4);
-                }
-
                 newMsgString(response);
             }, 0);
         }

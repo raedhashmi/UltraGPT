@@ -7,7 +7,7 @@ UltraGPT is a simple AI-powered interface that allows users to interact with an 
 To set up UltraGPT, install the required dependencies using the following commands:
 
 ```sh
-pip install flask openai langchain_google_genai langchain -qU
+pip install flask openai pywebview langchain_google_genai langchain -qU
 ```
 
 ## Setup
@@ -33,3 +33,7 @@ python index.py
 ## API Key Management
 
 If `GOOGLE_API_KEY.txt` does not contain a valid API key, the application will prompt an error message and ask you to obtain an API key from [Google AI Studio](https://aistudio.google.com/app/apikey?utm_source=colab.research.google.com&utm_medium=referral&utm_campaign=colab-integration&utm_content=owned-promo). After adding the key, restart the Flask app for the changes to take effect.
+
+## Running the EXE
+
+If you are unable to run `UltraGPT.py` or clone this project, you can individually run `UltraGPT.exe` in `output` to open the app. Note that this executable will not need the libraries or python installed but will run independently without any dependencies

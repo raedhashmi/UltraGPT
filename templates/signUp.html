@@ -30,7 +30,8 @@
         <nav class="navbar">
             <img class="navbar-logo" src="./resources/favicon.ico">
             <h1 class="navbar-title">UltraGPT <p class="creds">By <a href="https://github.com/raedhashmi/UltraGPT" target='_blank'>raedhashmi</a></p></h1>
-            <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+            <button class="sign-up-btn" onclick="document.querySelector('.sign-up-btn').innerHTML = ''; document.querySelector('.sign-up-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/signUp'; }, 700);">Sign up</button>
+            <button class="login-btn" onclick="document.querySelector('.login-btn').innerHTML = ''; document.querySelector('.login-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/login'; }, 700);">Login</button>
         </nav>
 
         <div class='signup-box'>

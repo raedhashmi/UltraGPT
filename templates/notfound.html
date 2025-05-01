@@ -7,19 +7,12 @@
     <title>UltraGPT - 404 Not Found</title>
 </head>
 <body>
-    <div class="delete-chat-popup" hidden onclick="if(event.target === this) { this.hidden = true; }">
-        <div class="delete-chat-popup-box">
-            <p class="delete-chat-popup-heading">Are you sure you want to delete this chat?</p>
-            <p class="delete-chat-popup-description">This action cannot be undone</p>
-            <button class="delete-chat-cancel-button" onclick="document.querySelector('.delete-chat-popup').hidden = true;">Cancel</button>
-            <button class="delete-chat-delete-button" onclick="localStorage.removeItem('ChatUUID4'); document.querySelector('.delete-chat-popup').hidden = true; window.location.href = '/'; localStorage.removeItem(`${localStorage.getItem('ChatUUID4')}_chat_history`); document.querySelector('.message-input').value = 'delete chat'; document.querySelector('.send-button').click();">Delete</button>
-        </div>
-    </div>
-
     <nav class="navbar">
         <img class="navbar-logo" src="./resources/favicon.ico">
         <h1 class="navbar-title">UltraGPT <p class="creds">By <a href="https://github.com/raedhashmi/UltraGPT" target="_blank">raedhashmi</a></p></h1>
-        <img class="delete-chat-icon" src="./resources/deleteChatIcon.png" onclick="document.querySelector('.delete-chat-popup').hidden = false;">
+        <button class="sign-up-btn" onclick="document.querySelector('.sign-up-btn').innerHTML = ''; document.querySelector('.sign-up-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/signUp'; }, 700);">Sign up</button>
+        <button class="login-btn" onclick="document.querySelector('.login-btn').innerHTML = ''; document.querySelector('.login-btn').style.animation = 'expand 0.8s ease-in-out'; setTimeout(() => { window.location.href = '/login'; }, 700);">Login</button>
+        <button class="account-button" hidden onclick="document.querySelector('.account-settings').toggleAttribute('hidden');"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z"></path></svg></button>
     </nav>
 
     <h1 class="no-data-message">Nothing here</h1>

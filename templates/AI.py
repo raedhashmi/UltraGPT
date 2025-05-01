@@ -1,6 +1,4 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
 from openai import OpenAI
