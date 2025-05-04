@@ -108,11 +108,11 @@
             
             <div class="account-settings-ai-models-panel" hidden>
                 <h1>AI Models</h1>
-                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o" onclick="localStorage.setItem('ai-model', 'gpt-4o');">
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o" onclick="updateModel()">
                 <label for="gpt-4o" class="ai-model-label">GPT-4o</label>
-                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o-mini" onclick="localStorage.setItem('ai-model', 'gpt-4o-mini');">
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-4o-mini" onclick="updateModel()">
                 <label for="gpt-4o-mini" class="ai-model-label">GPT-4o Mini</label>
-                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-3.5-turbo" onclick="localStorage.setItem('ai-model', 'gpt-3.5-turbo');">
+                <input type="radio" class="ai-model-radio" name="ai-model" id="gpt-3.5-turbo" onclick="updateModel()">
                 <label for="gpt-3.5-turbo" class="ai-model-label">GPT-3.5 Turbo</label>  
             </div>
 

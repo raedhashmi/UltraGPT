@@ -63,6 +63,14 @@ if (localStorage.getItem('loggedIn') == 'true') {
     document.querySelector('.account-button').hidden = true;
 }
 
+if (localStorage.getItem('ai-model') == 'gpt-4o') {
+    document.querySelector('#gpt-4o').checked = true;
+} else if (localStorage.getItem('ai-model') == 'gpt-4o-mini') {
+    document.querySelector('#gpt-4o-mini').checked = true;
+} else if (localStorage.getItem('ai-model') == 'gpt-3.5-turbo') {
+    document.querySelector('#gpt-3.5-turbo').checked = true;
+}
+
 document.querySelector('.account-settings-account-panel-username-input').value = localStorage.getItem('currentUsername');
 document.querySelector('.account-settings-account-panel-password-input').value = localStorage.getItem('currentPassword');
 
@@ -198,6 +206,20 @@ function applyTheme() {
         localStorage.removeItem('light-shaded-color');
         localStorage.removeItem('foreground-color');
         localStorage.removeItem('background-color');
+    }
+}
+
+function updateModel() {
+    let gpt4oRadio = document.getElementById('gpt-4o');
+    let gpt4oMiniRadio = document.getElementById('gpt-4o-mini');
+    let gpt35TurboRadio = document.getElementById('gpt-3.5-turbo');
+
+    if (gpt4oRadio.checked) { 
+        localStorage.setItem('ai-model', 'gpt-4o');
+    } else if (gpt4oMiniRadio.checked) {
+        localStorage.setItem('ai-model', 'gpt-4o-mini');
+    } else if (gpt35TurboRadio.checked) {
+        localStorage.setItem('ai-model', 'gpt-3.5-turbo');
     }
 }
 
@@ -344,11 +366,15 @@ async function sendMessage() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ prompt: prompt, loggedIn: 'false' }),
+                    body: JSON.stringify({ prompt: prompt, loggedIn: 'false', ai_model: localStorage.getItem('ai-model') }),
                 }).then(res => res.text());
             document.querySelector('.message-input').disabled = false;
             document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
             document.querySelector('.message-input').style.cursor = "text";
+            
+                if (response.startsWith("AI: ")) {
+                    response = response.substring(4);
+                }
 
                 newMsgString(response);
             }, 0);

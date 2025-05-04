@@ -1,7 +1,7 @@
 from flask import Flask, send_file, redirect, request
-from templates.AI import AI
-from templates.AI import setGoogleApiKey
-from templates.AI import setOpenAiApiKey
+from templates.generator import generate
+from templates.generator import set_google_api_key
+from templates.generator import set_openai_api_key
 import webview
 import time
 
@@ -25,10 +25,11 @@ def resource(resource):
 def ask():
     data = request.get_json()
     prompt = data.get('prompt')
-    loggedIn = data.get('loggedIn')
+    logged_in = data.get('loggedIn')
+    ai_model = data.get('ai_model')
     if not prompt:
         return "Error: No prompt provided", 400
-    response = AI(prompt, loggedIn)
+    response = generate(prompt, logged_in, ai_model)
     return response
 
 @app.route('/setGoogleApiKey', methods=['POST'])
@@ -37,7 +38,7 @@ def set_google_api_key():
     apiKey = data.get('apiKey') 
     if not apiKey:
         return "Error: No apiKey provided", 400
-    setGoogleApiKey(apiKey)
+    set_google_api_key(apiKey)
     return 'Successfully set Google API Key', 200
 
 @app.route('/setOpenAiApiKey', methods=['POST'])
@@ -46,7 +47,7 @@ def set_open_ai_api_key():
     apiKey = data.get('apiKey')
     if not apiKey:
         return "Error: No apiKey provided", 400
-    setOpenAiApiKey(apiKey)
+    set_openai_api_key(apiKey)
     return 'Successfully set OpenAI API Key', 200
 
 @app.route('/signUp')
