@@ -3,3 +3,4 @@ openai
 pywebview
 langchain_google_genai
 langchain
+dotenv

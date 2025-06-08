@@ -2,8 +2,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
 from openai import OpenAI
+import dotenv
 import time
 import os
+
+dotenv.load_dotenv()
 
 class ChatHistory:
     def __init__(self):
@@ -18,15 +21,42 @@ class ChatHistory:
 openai_memory = ChatHistory()
 
 def set_google_api_key(api_key: str):
-    with open(os.path.join(os.getcwd(), 'templates', 'GOOGLE_API_KEY.txt'), 'w') as f:
-        f.write(api_key)
+    env_path = os.path.join(os.getcwd(), 'templates', '.env')
+    # Read current lines or create default if not exists
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            lines = f.readlines()
+    else:
+        lines = ['OPENAI_API_KEY=\n', 'GOOGLE_API_KEY=\n']
+    # Ensure at least two lines
+    while len(lines) < 2:
+        lines.append('\n')
+    # Update the second line
+    lines[1] = f'GOOGLE_API_KEY={api_key}\n'
+    with open(env_path, 'w') as f:
+        f.writelines(lines)
 
 def set_openai_api_key(api_key: str):
-    with open(os.path.join(os.getcwd(), 'templates', 'OPENAI_API_KEY.txt'), 'w') as f:
-        f.write(api_key)
+    env_path = os.path.join(os.getcwd(), 'templates', '.env')
+    # Read current lines or create default if not exists
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            lines = f.readlines()
+    else:
+        lines = ['OPENAI_API_KEY=\n', 'GOOGLE_API_KEY=\n']
+    # Ensure at least two lines
+    while len(lines) < 2:
+        lines.append('\n')
+    # Update the first line
+    lines[0] = f'OPENAI_API_KEY={api_key}\n'
+    with open(env_path, 'w') as f:
+        f.writelines(lines)
 
-GOOGLE_API_KEY = open(os.path.join(os.getcwd(), 'templates', 'GOOGLE_API_KEY.txt')).read().strip()
-OPENAI_API_KEY = open(os.path.join(os.getcwd(), 'templates', 'OPENAI_API_KEY.txt')).read().strip()
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', '').strip()
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '').strip()
+
+print(f"GOOGLE_API_KEY: {GOOGLE_API_KEY}")
+print(f"OPENAI_API_KEY: {OPENAI_API_KEY}")
 
 llm = ChatGoogleGenerativeAI(
     api_key=GOOGLE_API_KEY,
@@ -81,7 +111,3 @@ def generate(prompt: str, logged_in: str, ai_model: str):
                 time.sleep(0.05)
     else:
         yield "Invalid login status."
-
-if __name__ == "__main__":
-    for chunk in generate("Hello", "true", 'gpt-4o'):
-        print(chunk, end='', flush=True)
