@@ -600,7 +600,7 @@ body {
 }
 
 .chat-output-text {
-    margin-top: -32px;
+    margin-top: -34px;
     margin-left: 36px;
 }
 
@@ -1034,6 +1034,18 @@ body {
         left: 50%;
         transform: translate(-50%, -50%) scale(1);
         background-color: var(--shaded-color);
+    }
+}
+
+@keyframes showHide {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
     }
 }
 

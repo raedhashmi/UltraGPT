@@ -1,11 +1,16 @@
-from flask import Flask, send_file, redirect, request
+from flask import Flask, send_file, redirect, request, Response
 from templates.generator import generate
 from templates.generator import set_google_api_key
 from templates.generator import set_openai_api_key
 import webview
 import time
+import os
 
 app = Flask(__name__)
+
+def updater():
+    os.startfile('updater.py')
+    print('\033[32mUpdater started!\033[0m')
 
 @app.route('/')
 def index():
@@ -29,8 +34,10 @@ def ask():
     ai_model = data.get('ai_model')
     if not prompt:
         return "Error: No prompt provided", 400
-    response = generate(prompt, logged_in, ai_model)
-    return response
+    def generate_stream():
+        for chunk in generate(prompt, logged_in, ai_model):
+            yield chunk
+    return Response(generate_stream(), mimetype='text/plain')
 
 @app.route('/setGoogleApiKey', methods=['POST'])
 def set_google_api_key():

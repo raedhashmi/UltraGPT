@@ -334,82 +334,93 @@ async function sendMessage() {
     }, 390);
 
     let prompt = document.querySelector('.message-input').value;
-    document.querySelector('.chat-area').innerHTML += `
+    const chatArea = document.querySelector('.chat-area');
+    chatArea.innerHTML += `
         <div class="user-message-box">
             <p class="user-avatar"><img class="user-pfp" src="./resources/userPfp.png" style="height: 34px; margin-left: -10px;"></p>
             <p class="user-box-text" style="margin: 0px; margin-right: 38px; margin-top: -32px; border-radius: 9px;">${prompt}</p>
         </div>
-
-        <br>
-        <br>
-        <br>
-        <br>
+        <br><br><br><br>
     `;
+    chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+    chatArea.hidden = false;
 
-    if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null)
-        document.querySelector('.chat-area').scrollTo({ top: document.querySelector('.chat-area').scrollHeight, behavior: 'smooth' });
+    // Add placeholder for AI response and keep a reference
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-output-box';
+    aiDiv.innerHTML = `
+        <p class="chat-output-logo"><img src="./resources/favicon.ico" style="height: 34px; margin-left: -10px;"></p>
+        <p class="chat-output-text">⬤</p>
+    `;
+    chatArea.appendChild(aiDiv);
+    const outputText = aiDiv.querySelector('.chat-output-text');
+    chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
 
-    if (localStorage.getItem('loggedIn') == 'false' || localStorage.getItem('loggedIn') == null) {
-        document.querySelector('.model-warning').hidden = false;
-        if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy') || GOOGLE_API_KEY.length != 39) {
-            document.querySelector('.message-input').value = '';
-            document.querySelector('.message-input').focus = false;
-            document.querySelector('.missing-google-api-key-error').hidden = false;
-            console.error("GOOGLE_API_KEY is incorrect");
+    // Disable input while waiting
+    const input = document.querySelector('.message-input');
+    input.disabled = true;
+    input.style.backgroundColor = "#282828";
+    input.style.cursor = "not-allowed";
+    outputText.style.animation = 'showHide 1s infinite ease-in-out';
+    outputText.innerHTML = '⬤'; // Show blinking cursor while waiting for first chunk
+
+    let response = '';
+    try {
+        // Choose model based on login status
+        const loggedIn = localStorage.getItem('loggedIn') == 'true' ? 'true' : 'false';
+        const ai_model = localStorage.getItem('ai-model') || 'gpt-4o-mini';
+
+        const fetchResponse = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, loggedIn, ai_model }),
+        });
+
+        
+        // Use streaming instead:
+        outputText.style.animation = 'none';
+        if (!fetchResponse.body || !window.ReadableStream) {
+            // Fallback: not a stream, just get text
+            let text = await fetchResponse.text();
+            response += text;
+            let formatted = response.replace(/\*' '\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            outputText.innerHTML = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+            chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
         } else {
-            document.querySelector('.message-input').disabled = true;
-            document.querySelector('.message-input').style.backgroundColor = "#282828";
-            document.querySelector('.message-input').style.cursor = "not-allowed";
-            setTimeout(async () => {
-                let response = await fetch('/ask', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: prompt, loggedIn: 'false', ai_model: localStorage.getItem('ai-model') }),
-                }).then(res => res.text());
-            document.querySelector('.message-input').disabled = false;
-            document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
-            document.querySelector('.message-input').style.cursor = "text";
-            
-                if (response.startsWith("AI: ")) {
-                    response = response.substring(4);
+            let firstChunk = true;
+            const reader = fetchResponse.body.getReader();
+            const decoder = new TextDecoder();
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                let text = decoder.decode(value, { stream: true });
+                if (text.startsWith('AI: ')) text = text.slice(4);
+                response += text;
+                if (text && text.trim()) {
+                    console.log('[AI Streamed chunk]', text);
                 }
-
-                newMsgString(response);
-            }, 0);
-        }
-    } else if (localStorage.getItem('loggedIn') == 'true') {
-        document.querySelector('.model-warning').hidden = true;
-        if (OPENAI_API_KEY == 'MISSING_KEY' || OPENAI_API_KEY == '' || !OPENAI_API_KEY.startsWith('sk-')) {
-            document.querySelector('.message-input').value = '';
-            document.querySelector('.message-input').focus = false;
-            document.querySelector('.missing-openai-api-key-error').hidden = false;
-            document.querySelector('.missing-openai-api-key-error-text').innerHTML = 'The OPENAI_API_KEY is undefined go to <a href="https://platform.openai.com/api-keys", target="_blank">OpenAI</a>, Sign Up and login then create your OPENAI_API_KEY and insert it below: ';
-            console.error("OPENAI_API_KEY is incorrect");
-        } else {
-            document.querySelector('.message-input').disabled = true;
-            document.querySelector('.message-input').style.backgroundColor = "#282828";
-            document.querySelector('.message-input').style.cursor = "not-allowed";
-            setTimeout(async () => {
-                let response = await fetch('/ask', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: prompt, loggedIn: 'true', ai_model: localStorage.getItem('ai-model') }),
-                }).then(res => res.text());
-            document.querySelector('.message-input').disabled = false;
-            document.querySelector('.message-input').style.backgroundColor = "var(--background-color)";
-            document.querySelector('.message-input').style.cursor = "text";
-
-                if (response.startsWith("AI: ")) {
-                    response = response.substring(4);
+                let formatted = response.replace(/\*' '\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                // Add blinking cursor (⬤) at the end, keep animation during streaming
+                outputText.innerHTML = formatted.replace(/`([^`]+)`/g, '<code>$1</code>') + '<span class="blinking-cursor" style="animation: showHide 1s infinite ease-in-out;">⬤</span>';
+                if (firstChunk) {
+                    outputText.style.animation = 'none'; // Remove old animation from the p
+                    firstChunk = false;
                 }
-
-                newMsgString(response);
-            }, 0);
+                chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+            }
+            // Remove blinking cursor after streaming is done
+            outputText.innerHTML = outputText.innerHTML.replace(/<span class="blinking-cursor"[^>]*>⬤<\/span>$/, '');
         }
+        // Save chat history
+        localStorage.setItem(`${localStorage.getItem("ChatUUID4")}_chat_history`, chatArea.innerHTML);
+    } catch (error) {
+        outputText.innerHTML = `<span style=\"color:red;\">Error: Failed to get response. Error ${error}</span>`;
+        console.error('AI chat error:', error);
+    } finally {
+        input.disabled = false;
+        input.style.backgroundColor = "var(--background-color)";
+        input.style.cursor = "text";
+        input.value = '';
     }
 }
 
@@ -502,9 +513,11 @@ function replaceOpenAiApiKey() {
 }
 
 function checkChatURL() {
-    if (window.location.pathname != `/${localStorage.getItem("ChatUUID4")}`) {
+    if (!window.location.href.includes(`/index?chat=${localStorage.getItem('ChatUUID4')}`)) {
         window.location.href = `/notfound`;
-    } else if (window.location.pathname == `/${localStorage.getItem("ChatUUID4")}`)
+        console.log('Invalid ChatUUID4, redirecting to notfound');
+    } else if (window.location.href.includes(`/index?chat=${localStorage.getItem('ChatUUID4')}`))
+        console.log('Valid ChatUUID4, proceeding with chat history loading');
         if (localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`) != null) {
             document.querySelector('.chat-area').innerHTML = localStorage.getItem(`${localStorage.getItem("ChatUUID4")}_chat_history`);
             document.querySelector('.suggestions-container').hidden = true;
