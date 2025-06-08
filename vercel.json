@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "builds": [
+        {
+            "src": "UltraGPT.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/templates/(.*)",
+            "dest": "/templates/$1"
+        }
+    ]
+}
