@@ -5,24 +5,36 @@ if (localStorage.getItem("ChatUUID4") == null) {
 }
 
 async function fetchGoogleKey() {
-    const res = await fetch('/resources/GOOGLE_API_KEY.txt').then(res => res.text()).then(res => res.trim());
-    const apiKey = res;
+    const res = await fetch('/resources/.env').then(res => res.text());
+    const lines = res.split('\n');
+    let apiKey = '';
+    if (lines.length > 1 && lines[1].startsWith('GOOGLE_API_KEY=')) {
+        apiKey = lines[1].replace('GOOGLE_API_KEY=', '').trim();
+    }
     localStorage.setItem("GOOGLE_API_KEY", apiKey);
-    return apiKey.trim();
+    return apiKey;
 };
 
 async function fetchOpenAiKey() {
-    const res = await fetch('/resources/OPENAI_API_KEY.txt').then(res => res.text()).then(res => res.trim());
-    const apiKey = res;
+    const res = await fetch('/resources/.env').then(res => res.text());
+    const lines = res.split('\n');
+    let apiKey = '';
+    if (lines.length > 0 && lines[0].startsWith('OPENAI_API_KEY=')) {
+        apiKey = lines[0].replace('OPENAI_API_KEY=', '').trim();
+    }
     localStorage.setItem("OPENAI_API_KEY", apiKey);
-    return apiKey.trim();
+    return apiKey;
 };
 
-fetchGoogleKey();
-fetchOpenAiKey();
+(async () => {
+    const GOOGLE_API_KEY = await fetchGoogleKey();
+    const OPENAI_API_KEY = await fetchOpenAiKey();
+    localStorage.setItem('GOOGLE_API_KEY', GOOGLE_API_KEY)
+    localStorage.setItem('OPENAI_API_KEY', OPENAI_API_KEY)
+})();
 
-const GOOGLE_API_KEY = localStorage.getItem("GOOGLE_API_KEY");
-const OPENAI_API_KEY = localStorage.getItem("OPENAI_API_KEY");
+const GOOGLE_API_KEY = localStorage.getItem('GOOGLE_API_KEY')
+const OPENAI_API_KEY = localStorage.getItem('OPENAI_API_KEY')
 
 if (GOOGLE_API_KEY == 'MISSING_KEY' || GOOGLE_API_KEY == '' || !GOOGLE_API_KEY.startsWith('AIzaSy')) {
     document.querySelector('.message-input').value = '';
@@ -396,11 +408,7 @@ async function sendMessage() {
                 let text = decoder.decode(value, { stream: true });
                 if (text.startsWith('AI: ')) text = text.slice(4);
                 response += text;
-                if (text && text.trim()) {
-                    console.log('[AI Streamed chunk]', text);
-                }
                 let formatted = response.replace(/\*' '\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                // Add blinking cursor (⬤) at the end, keep animation during streaming
                 outputText.innerHTML = formatted.replace(/`([^`]+)`/g, '<code>$1</code>') + '<span class="blinking-cursor" style="animation: showHide 1s infinite ease-in-out;">⬤</span>';
                 if (firstChunk) {
                     outputText.style.animation = 'none'; // Remove old animation from the p
