@@ -55,9 +55,6 @@ def set_openai_api_key(api_key: str):
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', '').strip()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '').strip()
 
-print(f"GOOGLE_API_KEY: {GOOGLE_API_KEY}")
-print(f"OPENAI_API_KEY: {OPENAI_API_KEY}")
-
 llm = ChatGoogleGenerativeAI(
     api_key=GOOGLE_API_KEY,
     model="gemini-1.5-flash",
@@ -73,7 +70,7 @@ conversation_chain = ConversationChain(
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def generate(prompt: str, logged_in: str, ai_model: str):
+def generate(prompt: str, logged_in: str, ai_model='gpt-4o'):
     if prompt == 'delete chat':
         memory.clear()
         openai_memory.clear()
@@ -90,11 +87,16 @@ def generate(prompt: str, logged_in: str, ai_model: str):
             messages=messages,
             stream=True
         )
+        response_text = ""
         for chunk in completion:
             delta = chunk.choices[0].delta.content or ''
             if delta:
+                response_text += delta
                 yield delta
-                time.sleep(0.05)  # 50ms delay between words
+                time.sleep(0.05)
+
+        openai_memory.add_message("user", prompt)
+        openai_memory.add_message("assistant", response_text)
     elif logged_in == 'false':
         response = conversation_chain.invoke(input=prompt)
         if isinstance(response, dict) and 'response' in response:

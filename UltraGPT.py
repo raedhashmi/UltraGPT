@@ -8,10 +8,6 @@ import os
 
 app = Flask(__name__)
 
-def updater():
-    os.startfile('updater.py')
-    print('\033[32mUpdater started!\033[0m')
-
 @app.route('/')
 def index():
     return send_file('templates/index.html')
