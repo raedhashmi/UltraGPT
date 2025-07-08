@@ -1,11 +1,10 @@
-import Navbar from "../../components/Navbar";
 import { Theme } from "@radix-ui/themes";
 import type { Metadata } from "next";
 import "@radix-ui/themes/styles.css";
-import "./globals.css";
+import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "UltraGPT",
+  title: "UltraGPT - Signup",
   description: "UltraGPT, now in NextJS!",
 };
 
@@ -18,7 +17,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Theme accentColor="orange" grayColor="sand" radius="large">
-          <Navbar />
           {children}
         </Theme>
       </body>
