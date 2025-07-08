@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from "next/link";
-import { Button, Tooltip, Text, IconButton, Avatar, Dialog, Flex, Tabs, Heading, Callout, Spinner, Switch, TextField, Badge, Card, Separator, DropdownMenu, RadioCards } from "@radix-ui/themes";
+import { Button, Tooltip, Text, IconButton, Avatar, Dialog, Flex, Tabs, Heading, Callout, Spinner, Switch, TextField, Badge, Card, Separator, DropdownMenu, RadioGroup } from "@radix-ui/themes";
 import { AvatarIcon, Cross1Icon, ExclamationTriangleIcon, EyeClosedIcon, EyeOpenIcon, SewingPinFilledIcon } from '@radix-ui/react-icons';
 
 export default function Navbar() {
@@ -13,7 +13,7 @@ export default function Navbar() {
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
-  const [ai_model, setAiModel] = useState('gpt-3.5')
+  const [ai_model, setAiModel] = useState('gpt-3.5-turbo')
   const [username, setUsername] = useState<any>()
   const [password, setPassword] = useState<any>()
   const usernameRef = useRef<HTMLInputElement>(null)
@@ -28,7 +28,7 @@ export default function Navbar() {
     setUsernameFirstLetter(localStorage.getItem('username')?.toString().charAt(0) ?? '?')
     setLoggedIn(localStorage.getItem('logged_in') ?? 'false')
     setDarkMode(localStorage.getItem('theme') === 'dark')
-    setAiModel(localStorage.getItem('ai_model') ?? 'gpt-3.5')
+    setAiModel(localStorage.getItem('ai_model') ?? 'gpt-3.5-turbo')
     setUsername(localStorage.getItem('username'))
     setPassword(localStorage.getItem('password'))
     setAccent(localStorage.getItem('accent') || 'orange');
@@ -78,17 +78,9 @@ export default function Navbar() {
     if (e.key === 'Enter') changeinfo()
   }
 
-  const toggleTheme = () => {
-    const newTheme = !darkMode ? 'dark' : 'light'
-    localStorage.setItem('theme', newTheme)
-    setDarkMode(!darkMode)
-    window.dispatchEvent(new Event('theme-updated'));
-  }
-
   const handleModelChange = (value: string) => {
     setAiModel(value)
     localStorage.setItem('ai_model', value)
-    window.dispatchEvent(new Event('theme-updated'));
   }
 
   if (loggedIn == 'false') {
@@ -226,23 +218,28 @@ export default function Navbar() {
                 </Tabs.Content>
 
                 <Tabs.Content value="aimodels">
-                  <div className="p-6 space-y-6 text-white">
+                  <div className="p-6 space-y-6">
                     <h3 className="text-lg font-bold">Select AI Model</h3>
-                    <p className="text-sm text-stone-300">Pick the model you'd like to use for chat completion.</p>
-                    <RadioCards.Root value={ai_model} onValueChange={handleModelChange} className="w-full flex flex-col gap-4">
+                    <p className="text-sm text-var(--theme-border)">Pick the model you'd like to use for chat completion.</p>
+                    <RadioGroup.Root value={ai_model} onValueChange={handleModelChange} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.7rem' }}>
                       {[
-                        ['gpt-4.5', 'Ultra accurate, slightly slower, best for long answers'],
-                        ['gpt-4.1', 'Fast and reliable, perfect balance'],
-                        ['gpt-3.5', 'Super fast, good for casual chat and speed']
-                      ].map(([model, desc]) => (
-                        <RadioCards.Item key={model} value={model} className={`items-center justify-between p-4 rounded-lg border transition cursor-pointer ${ai_model === model ? 'border-[var(--accent-a11)] bg-[var(--theme-card)] ring-1 ring-[var(--accent-a11)]' : 'border-[var(--theme-border)] bg-[var(--theme-card)] hover:border-[var(--accent-a11)]'}`}>
+                        ['gpt-3.5'],
+                        ['gpt-3.5-turbo'],
+                        ['gpt-3.5-turbo-0125'],
+                        ['gpt-3.5-turbo-1106'],
+                        ['gpt-3.5-turbo-16k'],
+                        ['grok-1'],
+                        ['grok-1.5'],
+                        ['grok-1.5v'],
+                        ['grok-2'],                        
+                      ].map(([model]) => (
+                        <RadioGroup.Item key={model} value={model} style={{ width: '100%' }} className={`items-center p-4 rounded-lg border transition cursor-pointer ${ai_model === model ? 'border-[var(--accent-a11)] bg-[var(--theme-card)] ring-1 ring-[var(--accent-a11)]' : 'border-[var(--theme-border)] bg-[var(--theme-card)] hover:border-[var(--accent-a11)]'}`}>
                           <div>
                             <span className="font-bold text-[var(--theme-text)]">{model}</span>
-                            <p className="text-xs text-zinc-400">{desc}</p>
                           </div>
-                        </RadioCards.Item>
+                        </RadioGroup.Item>
                       ))}
-                    </RadioCards.Root>
+                    </RadioGroup.Root>
                   </div>
                 </Tabs.Content>
 

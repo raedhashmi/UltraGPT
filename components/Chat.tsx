@@ -7,12 +7,12 @@ import SignupCard from './SignupCard'
 import Suggestions from './Suggestions'
 import { v4 as uuidv4 } from 'uuid'
 
-export default function Chat({ apiKey }: { apiKey: string }) {
+export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: string, grokApiKey: string }) {
   const promptRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([])
   const [streaming, setStreaming] = useState(false)
-  const [hasStartedStreaming, setHasStartedStreaming] = useState(false)
+  const [ai_model, setAiModel] = useState('gpt-3.5-turbo')
   const [navbarStart, setNavbarStart] = useState('#994700');
   const [navbarEnd, setNavbarEnd] = useState('#3a1b00');
 
@@ -64,27 +64,57 @@ export default function Chat({ apiKey }: { apiKey: string }) {
     if (!promptRef.current || !promptRef.current.value.trim()) return
     setLoading(true)
     setStreaming(true)
-    setHasStartedStreaming(false)
     const messageText = promptRef.current.value.trim()
     promptRef.current.value = '' // clear input
     // Add user message
     setChatHistory(prev => [...prev, { role: 'user', content: messageText }])
-    // Prepare messages for OpenAI API (include all history)
+    // Prepare messages for API (include all history)
     const messages = [...chatHistory, { role: 'user', content: messageText }]
     // Add a placeholder for the assistant's response
     setChatHistory(prev => [...prev, { role: 'assistant', content: '' }])
-    // OpenAI API request
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
+
+    let apiUrl = ''
+    let headers: Record<string, string> = {}
+    let body: any = {}
+    let apiKey = ''
+
+    if (ai_model.toLowerCase().includes('grok')) {
+      // Grok API
+      apiUrl = 'https://gateway.theturbo.ai/v1/chat/completions'
+      apiKey = grokApiKey
+      headers = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      }
+      body = {
+        model: ai_model,
         messages: messages,
         stream: true
-      })
+      }
+    } else if (ai_model.startsWith('gpt-')) {
+      // OpenAI API
+      apiUrl = 'https://api.openai.com/v1/chat/completions'
+      apiKey = openaiApiKey
+      headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      }
+      body = {
+        model: ai_model,
+        messages: messages,
+        stream: true
+      }
+    } else {
+      setLoading(false)
+      setStreaming(false)
+      return
+    }
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
     })
     const reader = res.body?.getReader()
     const decoder = new TextDecoder()
@@ -95,7 +125,6 @@ export default function Chat({ apiKey }: { apiKey: string }) {
     }
     let aiContent = ''
     let isDone = false
-    let firstChunk = true
     const updateAssistantMessage = (content: string) => {
       setChatHistory(prev => {
         // Find the last assistant message and update its content
@@ -123,14 +152,14 @@ export default function Chat({ apiKey }: { apiKey: string }) {
             isDone = true
             return
           }
-          const parsed = JSON.parse(json)
-          const content = parsed.choices?.[0]?.delta?.content || ''
-          if (content && firstChunk) {
-            setHasStartedStreaming(true)
-            firstChunk = false
+          try {
+            const parsed = JSON.parse(json)
+            const content = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.message?.content || ''
+            aiContent += content
+            updateAssistantMessage(aiContent)
+          } catch (e) {
+            // ignore JSON parse errors
           }
-          aiContent += content
-          updateAssistantMessage(aiContent)
         }
       }
       return reader?.read().then(process)

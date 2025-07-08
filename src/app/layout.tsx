@@ -1,5 +1,5 @@
+import ThemeProvider from "../../components/ThemeProvider";
 import Navbar from "../../components/Navbar";
-import { Theme } from "@radix-ui/themes";
 import type { Metadata } from "next";
 import "@radix-ui/themes/styles.css";
 import "./globals.css";
@@ -16,11 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Theme accentColor="orange" grayColor="sand" radius="large">
+      <body className="min-h-screen flex flex-col">
+        <ThemeProvider>
           <Navbar />
           {children}
-        </Theme>
+        </ThemeProvider>
       </body>
     </html>
   );
