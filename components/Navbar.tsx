@@ -85,7 +85,6 @@ export default function Navbar() {
 
   if (loggedIn == 'false') {
     return (
-      <main>
         <nav className="flex items-center px-6 py-4 text-white" style={{ background: 'var(--nav-gradient, linear-gradient(to right, #994700, #3a1b00))' }}>
           <img src="/favicon.ico" className="w-14 h-auto mx-2 mr-3" />
           <Text weight={'bold'} size={'5'}>UltraGPT</Text>
@@ -94,12 +93,10 @@ export default function Navbar() {
           <Tooltip content="Log In"><span className="mr-3 ml-auto hover:scale-110 transform transition"><Button onClick={() => window.location.href = '/login'}>Log In</Button></span></Tooltip>
           <Tooltip content="Sign Up"><span className="hover:scale-110 transform transition"><Button onClick={() => window.location.href = '/signup'}>Sign Up</Button></span></Tooltip>
         </nav>
-      </main>
     );
   } else {
     return (
-      <main>
-        <nav className="flex items-center px-6 py-4 text-white" style={{ background: 'var(--nav-gradient, linear-gradient(to right, #994700, #3a1b00))' }}>
+      <nav className="flex items-center px-6 py-4 text-white" style={{ background: 'var(--nav-gradient, linear-gradient(to right, #994700, #3a1b00))' }}>
           <img src="/favicon.ico" className="w-14 h-auto mx-2 mr-3" />
           <Text weight={'bold'} size={'5'}>UltraGPT</Text>
           <span className="ml-2 -mt-1"><Text size={'1'}>By <Link href="https://github.com/raedhashmi/" className="font-mono">raedhashmi</Link></Text></span>
@@ -264,7 +261,6 @@ export default function Navbar() {
             </Dialog.Content>
           </Dialog.Root>
         </nav>
-      </main>
     );
   }
 }

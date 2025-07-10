@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: string, grokApiKey: string }) {
   const promptRef = useRef<HTMLInputElement>(null)
+  const chatAreaRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([])
   const [streaming, setStreaming] = useState(false)
@@ -16,21 +17,17 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
   const [navbarStart, setNavbarStart] = useState('#994700');
   const [navbarEnd, setNavbarEnd] = useState('#3a1b00');
 
-  // Ensure chat_uuid exists in localStorage
   useEffect(() => {
-    let uuid = localStorage.getItem('chat_uuid')
+    // Ensure chat_uuid exists in localStorage
+    let uuid = localStorage.getItem('chat_uuid');
     if (!uuid) {
-      uuid = uuidv4()
-      localStorage.setItem('chat_uuid', uuid)
+      uuid = uuidv4();
+      localStorage.setItem('chat_uuid', uuid);
     }
-  }, [])
 
-  // Load chat history from localStorage on mount
-  useEffect(() => {
-    const uuid = localStorage.getItem('chat_uuid');
+    // Load chat history from localStorage on mount
     const historyHtml = localStorage.getItem(`${uuid}_chat_history`);
     if (historyHtml) {
-      // Try to parse as JSON array, fallback to empty
       try {
         const parsed = JSON.parse(historyHtml);
         if (Array.isArray(parsed)) setChatHistory(parsed);
@@ -38,27 +35,67 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
         setChatHistory([]);
       }
     }
-  }, [])
 
-  // Save chat history to localStorage whenever it changes
+    // Load navbar colors
+    setNavbarStart(localStorage.getItem('navbarStart') || '#994700');
+    setNavbarEnd(localStorage.getItem('navbarEnd') || '#3a1b00');
+
+    // Sync ai_model from localStorage
+    if (localStorage.getItem('ai_model')) {
+      setAiModel(localStorage.getItem('ai_model') || '');
+    } else {
+      localStorage.setItem('ai_model', 'gpt-3.5-turbo');
+      setAiModel(localStorage.getItem('ai_model') || '');
+    }
+
+    // Event listeners for model updates
+    const updateModel = () => {
+      setAiModel(localStorage.getItem('ai_model') || 'gpt-3.5-turbo');
+    };
+    window.addEventListener('storage', updateModel);
+    window.addEventListener('model-updated', updateModel);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', updateModel);
+      window.removeEventListener('model-updated', updateModel);
+    };
+  }, []);
+
+  // Save chat history and navbar colors to localStorage whenever they change
   useEffect(() => {
     const uuid = localStorage.getItem('chat_uuid');
     localStorage.setItem(`${uuid}_chat_history`, JSON.stringify(chatHistory));
-  }, [chatHistory])
-
-  useEffect(() => {
-    setNavbarStart(localStorage.getItem('navbarStart') || '#994700');
-    setNavbarEnd(localStorage.getItem('navbarEnd') || '#3a1b00');
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem('navbarStart', navbarStart);
     localStorage.setItem('navbarEnd', navbarEnd);
     document.documentElement.style.setProperty(
       '--nav-gradient',
       `linear-gradient(to right, ${navbarStart}, ${navbarEnd})`
     );
-  }, [navbarStart, navbarEnd]);
+  }, [chatHistory, navbarStart, navbarEnd]);
+
+  const scrollToBottom = () => {
+    document.documentElement.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory]);
+
+  useEffect(() => {
+    let scrollInterval: NodeJS.Timeout | null = null;
+    if (streaming) {
+      scrollInterval = setInterval(scrollToBottom, 200);
+    } else if (scrollInterval) {
+      clearInterval(scrollInterval);
+    }
+    return () => {
+      if (scrollInterval) clearInterval(scrollInterval);
+    };
+  }, [streaming]);
 
   const sendMessage = async () => {
     if (!promptRef.current || !promptRef.current.value.trim()) return
@@ -72,13 +109,18 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
     const messages = [...chatHistory, { role: 'user', content: messageText }]
     // Add a placeholder for the assistant's response
     setChatHistory(prev => [...prev, { role: 'assistant', content: '' }])
+    // Scroll after sending
+    scrollToBottom();
+
+    // Always get the latest model from localStorage
+    const model = localStorage.getItem('ai_model') || ai_model;
 
     let apiUrl = ''
     let headers: Record<string, string> = {}
     let body: any = {}
     let apiKey = ''
 
-    if (ai_model.toLowerCase().includes('grok')) {
+    if (model.toLowerCase().includes('grok')) {
       // Grok API
       apiUrl = 'https://gateway.theturbo.ai/v1/chat/completions'
       apiKey = grokApiKey
@@ -88,11 +130,11 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
         'Authorization': `Bearer ${apiKey}`
       }
       body = {
-        model: ai_model,
+        model: model,
         messages: messages,
         stream: true
       }
-    } else if (ai_model.startsWith('gpt-')) {
+    } else if (model.includes('gpt')) {
       // OpenAI API
       apiUrl = 'https://api.openai.com/v1/chat/completions'
       apiKey = openaiApiKey
@@ -101,7 +143,7 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
         'Authorization': `Bearer ${apiKey}`
       }
       body = {
-        model: ai_model,
+        model: model,
         messages: messages,
         stream: true
       }
@@ -167,18 +209,14 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
     reader.read().then(process)
   }
 
-  // Scroll to bottom when chatHistory changes
-  const chatAreaRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (chatAreaRef.current) {
-      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight
-    }
-  }, [chatHistory])
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') sendMessage()
+  }
 
   return (
-    <main className="flex flex-col flex-1 min-h-0 h-full">
+    <>
       <Suggestions chatHistory={chatHistory.length > 0 ? 'not-null' : null} />
-      <div className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col" ref={chatAreaRef}>
+      <div className="flex-1 h-auto overflow-y-auto p-4 flex flex-col" ref={chatAreaRef}>
         <SignupCard />
         {chatHistory.map((msg, i) => {
           const isLatestAssistant =
@@ -206,8 +244,8 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
           )
         })}
       </div>
-      <div className="p-4 w-full">
-        <TextField.Root placeholder='Message anything...' size='3' ref={promptRef}>
+      <div className="p-4 w-full absolute bottom-0">
+        <TextField.Root placeholder='Message anything...' size='3' ref={promptRef} onKeyDown={handleKeyDown}>
           <TextField.Slot>
             <ChatBubbleIcon />
           </TextField.Slot>
@@ -218,6 +256,6 @@ export default function Chat({ openaiApiKey, grokApiKey }: { openaiApiKey: strin
           </TextField.Slot>
         </TextField.Root>
       </div>
-    </main>
+    </>
   ) 
 }

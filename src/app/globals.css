@@ -17,6 +17,7 @@
 body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  height: 100vh;
 }
 
 body.theme-light {
