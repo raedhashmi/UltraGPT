@@ -225,10 +225,10 @@ export default function Navbar() {
                         ['gpt-3.5-turbo-0125'],
                         ['gpt-3.5-turbo-1106'],
                         ['gpt-3.5-turbo-16k'],
-                        ['grok-1'],
-                        ['grok-1.5'],
-                        ['grok-1.5v'],
-                        ['grok-2'],                        
+                        ['gemini-pro'],
+                        ['gemini-1.5-pro'],
+                        ['gemini-ultra'],
+                        ['gemini-1.5-flash'],
                       ].map(([model]) => (
                         <RadioGroup.Item key={model} value={model} style={{ width: '100%' }} className={`items-center p-4 rounded-lg border transition cursor-pointer ${ai_model === model ? 'border-[var(--accent-a11)] bg-[var(--theme-card)] ring-1 ring-[var(--accent-a11)]' : 'border-[var(--theme-border)] bg-[var(--theme-card)] hover:border-[var(--accent-a11)]'}`}>
                           <div>

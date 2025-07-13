@@ -23,7 +23,8 @@ body {
 body.theme-light {
   --theme-text: #222;
   --theme-bg: #fff;
-  --themecard: #f3f3f3;
+  --theme-card: #f3f3f3;
+  --theme-card-rgb: 243, 243, 243;
   --theme-border: #e0e0e0;
   color: var(--themetext);
   background: var(--themebg);
@@ -33,6 +34,7 @@ body.theme-dark {
   --theme-text: #fff;
   --theme-bg: #111;
   --theme-card: #1111;
+  --theme-card-rgb: 17, 17, 17;
   --theme-border: #3d3937;
   color: var(--themetext);
   background: var(--themebg);

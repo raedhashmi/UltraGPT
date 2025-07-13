@@ -1,14 +1,12 @@
 import { Card, Text, Link } from '@radix-ui/themes'
 import React, { useEffect, useState } from 'react'
 
-export default function SignupCard() {
+export default function SignupCard({ chatHistory }: { chatHistory: string | null }) {
   let [showSignup, setShowSignup] = useState(false)
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('logged_in') === 'true';
-    const uuid = localStorage.getItem('chat_uuid');
-    const history = localStorage.getItem(`${uuid}_chat_history`);
-    setShowSignup(!loggedIn && !!history && history !== '');
+    setShowSignup(!loggedIn && !chatHistory == null);
   }, [])
   return (
     <Card hidden={!showSignup} className='relative left-1/2 transform -translate-x-1/2 w-fit'>
