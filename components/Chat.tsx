@@ -1,20 +1,14 @@
 'use client'
 
-import { ChatBubbleIcon, ExclamationTriangleIcon, PaperPlaneIcon, CopyIcon, CheckIcon, ReloadIcon, Cross1Icon, InfoCircledIcon } from '@radix-ui/react-icons'
-import { Avatar, Card, IconButton, Spinner, TextField, Text } from '@radix-ui/themes'
-import { Callout, Button } from '@radix-ui/themes';
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import SignupCard from './SignupCard'
-import Suggestions from './Suggestions'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
+import SignupCard from './SignupCard';
+import Suggestions from './Suggestions';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
-const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
-const QUOTA_TIMEOUT = 600000; // 10 minutes in ms
-const SCROLL_THRESHOLD = 2;
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { vscDarkPlus, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Avatar, Card, IconButton, Spinner, Callout, Button, Text } from '@radix-ui/themes';
+import { ChatBubbleIcon, ExclamationTriangleIcon, PaperPlaneIcon, CopyIcon, CheckIcon, ReloadIcon, Cross1Icon, InfoCircledIcon } from '@radix-ui/react-icons';
 
 export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
   const promptRef = useRef<HTMLInputElement>(null);
@@ -68,7 +62,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     const quotaExceededTime = localStorage.getItem('quota_exceeded_time');
     if (quotaExceededTime) {
       const timeDiff = Date.now() - parseInt(quotaExceededTime);
-      const remainingTime = Math.max(0, QUOTA_TIMEOUT - timeDiff);
+      const remainingTime = Math.max(0, 30 * 60 * 1000 - timeDiff);
       if (remainingTime > 0) {
         setQuotaExceeded(true);
         setQuotaTimer(Math.ceil(remainingTime / 1000));
@@ -80,7 +74,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     // Event handlers
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      setNoScroll(scrollHeight <= clientHeight + SCROLL_THRESHOLD);
+      setNoScroll(scrollHeight <= clientHeight + 2);
     };
 
     const handleThemeChange = () => {
@@ -168,7 +162,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     
     try {
       console.log('Sending request to Gemini API...');
-      const url = `${GEMINI_API_BASE}${ai_model}:generateContent?key=${geminiApiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${ai_model}:generateContent?key=${geminiApiKey}`;
       
       const body = {
         contents: messages.map(m => ({
