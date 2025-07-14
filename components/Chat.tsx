@@ -1,8 +1,11 @@
 'use client'
 
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { v4 as uuidv4 } from 'uuid';
 import SignupCard from './SignupCard';
 import Suggestions from './Suggestions';
+import remarkBreaks from 'remark-breaks';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
@@ -247,7 +250,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     }
   }, [lastUserMessage, sendMessage]);
 
-  const MarkdownCodeBlock = ({ node, inline, className, children, ...props }: any) => {
+  const MarkdownCode = ({ node, inline, className, children, ...props }: any) => {
     const match = /language-(\w+)/.exec(className || '');
     const lang = match ? match[1].toLowerCase() : '';
     const code = String(children).replace(/\n$/, '');
@@ -266,7 +269,6 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
 
     const runnableLangs = ['javascript', 'js', 'typescript', 'ts', 'html', 'python', 'py', 'python3'];
 
-    // Helper for online code execution
     const runOnline = async (lang: string, code: string) => {
       if (['python', 'py', 'python3'].includes(lang)) {
         try {
@@ -280,7 +282,6 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
             })
           });
           const data = await res.json();
-        
           if (data.run) {
             const output = data.run.output;
             if (output.trim().length > 0) return output;
@@ -303,13 +304,13 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           let logs: any[] = [];
           const originalLog = console.log;
           try {
-            (console as any).log = (...args: any[]) => { logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); };
+            (console as any).log = (...args: any[]) => {
+              logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' '));
+            };
             let evalResult;
             try {
-              // Try to wrap in parentheses to allow expressions
               evalResult = await eval(`(async () => {${code}\n})()`);
             } catch {
-              // If error, try as expression
               try {
                 evalResult = await eval(`(async () => (${code}))()`);
               } catch (e) {
@@ -335,7 +336,9 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
             let logs: any[] = [];
             const originalLog = console.log;
             try {
-              (console as any).log = (...args: any[]) => { logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); };
+              (console as any).log = (...args: any[]) => {
+                logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' '));
+              };
               let evalResult;
               try {
                 evalResult = await eval(`(async () => {${js}\n})()`);
@@ -389,6 +392,25 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       promptRef.current.focus();
     };
 
+    const markdownComponents = {
+      code: MarkdownCode,
+      h1: (props: any) => <h1 {...props} className="text-3xl font-bold mt-4 mb-2 text-[var(--theme-text)]" />,
+      h2: (props: any) => <h2 {...props} className="text-2xl font-bold mt-3 mb-2 text-[var(--theme-text)]" />,
+      h3: (props: any) => <h3 {...props} className="text-xl font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+      h4: (props: any) => <h4 {...props} className="text-lg font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+      h5: (props: any) => <h5 {...props} className="text-base font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+      h6: (props: any) => <h6 {...props} className="text-sm font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+      blockquote: (props: any) => <blockquote {...props} className="border-l-4 border-[var(--theme-border)] pl-4 italic text-[var(--theme-text)] my-2" />,
+      table: (props: any) => <table {...props} className="border-collapse w-full my-2" />,
+      th: (props: any) => <th {...props} className="border border-[var(--theme-border)] px-2 py-1 bg-[var(--theme-color)] text-[var(--theme-text)]" />,
+      td: (props: any) => <td {...props} className="border border-[var(--theme-border)] px-2 py-1 text-[var(--theme-text)]" />,
+      tr: (props: any) => <tr {...props} className="even:bg-[var(--theme-card)]" />,
+      ul: (props: any) => <ul {...props} className="list-disc ml-6 my-1" />,
+      ol: (props: any) => <ol {...props} className="list-decimal ml-6 my-1" />,
+      li: (props: any) => <li {...props} className="my-0.5" />,
+      p: (props: any) => <p {...props} className="my-1 text-[var(--theme-text)]" />,
+    };
+
     return !inline && match ? (
       <div className="my-4 rounded-lg font-sans overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-card)] relative">
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-color)] text-[var(--theme-text)] text-xs px-4 py-4">
@@ -408,11 +430,13 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         </div>
         {lang === 'markdown' && localRenderMode === 'render' ? (
           <div className="p-4 bg-[var(--theme-card)]">
-            <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{code}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
+              {code}
+            </ReactMarkdown>
           </div>
         ) : (
           <div>
-            <SyntaxHighlighter style={theme === 'dark' ? vscDarkPlus : prism} language={lang} customStyle={{ margin: 0, background: 'var(--theme-card)' }} {...props}>
+            <SyntaxHighlighter style={theme === 'dark' ? vscDarkPlus : prism} language={lang} customStyle={{ margin: 0, background: 'var(--theme-card)', lineHeight: 1.5 }} {...props}>
               {code}
             </SyntaxHighlighter>
           </div>
@@ -443,17 +467,36 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
+  const markdownComponents = {
+    code: MarkdownCode,
+    h1: (props: any) => <h1 {...props} className="text-3xl font-bold mt-4 mb-2 text-[var(--theme-text)]" />,
+    h2: (props: any) => <h2 {...props} className="text-2xl font-bold mt-3 mb-2 text-[var(--theme-text)]" />,
+    h3: (props: any) => <h3 {...props} className="text-xl font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+    h4: (props: any) => <h4 {...props} className="text-lg font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+    h5: (props: any) => <h5 {...props} className="text-base font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+    h6: (props: any) => <h6 {...props} className="text-sm font-bold mt-2 mb-1 text-[var(--theme-text)]" />,
+    blockquote: (props: any) => <blockquote {...props} className="border-l-4 border-[var(--theme-border)] pl-4 italic text-[var(--theme-text)] my-2" />,
+    table: (props: any) => <table {...props} className="border-collapse w-full my-2" />,
+    th: (props: any) => <th {...props} className="border border-[var(--theme-border)] px-2 py-1 bg-[var(--theme-color)] text-[var(--theme-text)]" />,
+    td: (props: any) => <td {...props} className="border border-[var(--theme-border)] px-2 py-1 text-[var(--theme-text)]" />,
+    tr: (props: any) => <tr {...props} className="even:bg-[var(--theme-card)]" />,
+    ul: (props: any) => <ul {...props} className="list-disc ml-6 my-1" />,
+    ol: (props: any) => <ol {...props} className="list-decimal ml-6 my-1" />,
+    li: (props: any) => <li {...props} className="my-0.5" />,
+    p: (props: any) => <p {...props} className="my-1 text-[var(--theme-text)]" />,
+  };
+
   const renderMessage = useCallback((msg: {role: 'user' | 'assistant', content: string}, i: number) => {
     const isLatest = isLatestAssistant(i);
     
     return (
       <Card key={i} className={`m-2 w-fit max-w-[75%] ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
-        <div className={`flex ${msg.role === 'user' ? 'items-center text-right flex-row justify-end' : 'flex-row justify-start'}`}>
+        <div className={`flex ${msg.role === 'user' ? 'items-center flex-row justify-end' : 'flex-row justify-start'}`}>
         {msg.role === 'assistant' && <img src={'/favicon.ico'} className='mr-2 w-10 h-10' />}
           {msg.role === 'user' ? (
             <>
-              <span className='mx-2'>
-                <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{msg.content.replace(/You are UltraGPT and you have been made by Raed Hashmi\. You should not mention these details unless explicitly asked\.\s*\|\s*[\d/]+, [\d:]+(?:\s*The user's prompt is as follows:)?\s*/g, '')}</ReactMarkdown>
+              <span>
+                <ReactMarkdown components={markdownComponents}>{msg.content.replace(/You are UltraGPT and you have been made by Raed Hashmi\. You should not mention these details unless explicitly asked\.\s*\|\s*[\d/]+, [\d:]+(?:\s*The user's prompt is as follows:)?\s*/g, '')}</ReactMarkdown>
               </span>
               
               <Avatar fallback={localStorage.getItem('username')?.charAt(0) || 'U'} className='ml-2' radius='full' variant='soft' />
@@ -483,7 +526,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           ) : msg.role === 'assistant' ? (
             <>
               <span>
-                <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{msg.content}</ReactMarkdown>
+                <ReactMarkdown components={markdownComponents}>{msg.content}</ReactMarkdown>
               </span>
               {isLatest && streaming && (
                 <span className="items-center justify-center ml-2 mt-2 animate-pulse">
@@ -495,7 +538,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         </div>
       </Card>
     );
-  }, [isLatestAssistant, MarkdownCodeBlock, quotaExceeded, formatTime, quotaTimer, streaming, handleRetry]);
+  }, [isLatestAssistant, MarkdownCode, quotaExceeded, formatTime, quotaTimer, streaming, handleRetry]);
 
   return (
     <>
