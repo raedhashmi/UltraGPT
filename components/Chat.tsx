@@ -418,12 +418,12 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           </div>
         )}
         {output !== null && (
-          <div className={`m-4 rounded-lg font-sans ${lang === 'html' ? 'h-[100%]' : ''} bg-[var(--theme-card)] relative`}>
+          <div className={`m-4 rounded-lg font-sans ${lang === 'html' ? 'h-[100%]' : ''} border border-[var(--theme-border)] bg-[var(--theme-card)] relative`}>
             <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-color)] text-[var(--theme-text)] text-xs px-4 py-4">
               <Text size="2" weight="bold" className="mr-2">Output</Text>
               <Button size="1" variant="soft" onClick={handleAskAbout}>Ask about this</Button>
             </div>
-            <div className="bg-[var(--theme-card)] rounded p-2 text-sm">
+            <div className="bg-[var(--theme-card)] rounded p-4 text-sm">
               {lang === 'html'
                 ? <span dangerouslySetInnerHTML={{ __html: output }}/>
                 : <pre style={{ margin: 0, padding: 0, whiteSpace: 'pre-wrap' }}>{output}</pre>
@@ -458,7 +458,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
               
               <Avatar fallback={localStorage.getItem('username')?.charAt(0) || 'U'} className='ml-2' radius='full' variant='soft' />
             </>
-          ) : error ? (
+          ) : error && isLatest ? (
               <Callout.Root color="red">
                 <div className='flex flex-col items-center'>
                   <Callout.Text>
@@ -486,7 +486,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
                 <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{msg.content}</ReactMarkdown>
               </span>
               {isLatest && streaming && (
-                <span className="items-center justify-center ml-2 animate-pulse">
+                <span className="items-center justify-center ml-2 mt-2 animate-pulse">
                   <span className="inline-block w-4 h-4 bg-white rounded-full"></span>
                 </span>
               )}
@@ -499,14 +499,8 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
 
   return (
     <>
-      <Suggestions
-        prompt={promptRef.current || null}
-        chatHistory={chatHistory.length > 0 ? "not-null" : null}
-      />
-      <div
-        className="flex-1 overflow-y-auto p-4 flex flex-col"
-        ref={chatAreaRef}
-      >
+      <Suggestions prompt={promptRef.current || null} chatHistory={chatHistory.length > 0 ? "not-null" : null}/>
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col" ref={chatAreaRef}>
         <SignupCard chatHistory={chatHistory.length > 0 ? "not-null" : null} />
         {chatHistory.map(renderMessage)}
       </div>
@@ -544,12 +538,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
             {quotaExceeded ? <Cross1Icon /> : <ChatBubbleIcon />}
           </span>
           <span className="absolute right-3 mt-4">
-            <IconButton
-              size="2"
-              variant="ghost"
-              onClick={() => sendMessage()}
-              disabled={quotaExceeded || loading}
-            >
+            <IconButton size="2" variant="ghost" onClick={() => sendMessage()} disabled={quotaExceeded || loading}>
               {loading ? (
                 <Spinner size="1" />
               ) : (
