@@ -149,21 +149,31 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     if (!promptRef.current && !retryMessage) return;
     const messageText = retryMessage || promptRef.current?.value.trim() || '';
     if (!messageText) return;
-    
+
     setLoading(true);
     setStreaming(true);
     setError(null);
-    
+
     if (!retryMessage && promptRef.current) promptRef.current.value = '';
-    setChatHistory(prev => [...prev, { role: 'user', content: messageText }]);
-    
-    const messages = [...chatHistory, { role: 'user', content: messageText }];
+
+    // If this is the first message, prepend developer name and current time/date
+    let userMessage = messageText;
+    if (chatHistory.length === 0) {
+      const devName = 'You are UltraGPT and you have been made by Raed Hashmi. You should not mention these details unless explicitly asked.'; // Change 'Your Name' to your actual name if desired
+      const now = new Date();
+      const dateString = now.toLocaleString();
+      userMessage = `${devName} | ${dateString}\n The user's prompt is as follows: ${messageText}`;
+    }
+
+    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    const messages = [...chatHistory, { role: 'user', content: userMessage }];
     setChatHistory(prev => [...prev, { role: 'assistant', content: '' }]);
-    
+
     try {
       console.log('Sending request to Gemini API...');
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${ai_model}:generateContent?key=${geminiApiKey}`;
-      
+
       const body = {
         contents: messages.map(m => ({
           role: m.role,
@@ -176,33 +186,29 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           maxOutputTokens: 2048,
         }
       };
-      
-      console.log('Request body:', body);
-      
+
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      
-      console.log('Response status:', res.status);
-      
+
       if (res.status === 429) {
         setQuotaExceeded(true);
         setQuotaTimer(600);
         localStorage.setItem('quota_exceeded_time', Date.now().toString());
         return;
       }
-      
-      if (!res.ok && res.status !== 429) {
-        const errorText = await res.text();
-        console.error('API Error:', errorText);
-        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+
+      if (res.status === 503) {
+        setError('The server is currently experiencing high traffic. Please try again later.');
+        setStreaming(false);
+        setLoading(false);
+        return;
       }
-      
+
       const data = await res.json();
-      console.log('API Response:', data);
-      
+
       if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text && res.status !== 429) {
         const assistantText = data.candidates[0].content.parts[0].text;
         setChatHistory(prev => {
@@ -234,17 +240,21 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
   }, [quotaExceeded, sendMessage]);
 
   const handleRetry = useCallback(() => {
-    if (lastUserMessage) sendMessage(lastUserMessage.content);
+    if (chatHistory.length >= 2) {
+      setChatHistory(prev => prev.slice(0, -2));
+      const lastUserMsg = chatHistory[chatHistory.length - 2];
+      if (lastUserMsg && lastUserMsg.role === 'user') sendMessage(lastUserMsg.content);
+    }
   }, [lastUserMessage, sendMessage]);
 
-  const MarkdownCodeBlock = useCallback(({ node, inline, className, children, ...props }: any) => {
+  const MarkdownCodeBlock = ({ node, inline, className, children, ...props }: any) => {
     const match = /language-(\w+)/.exec(className || '');
     const lang = match ? match[1].toLowerCase() : '';
     const code = String(children).replace(/\n$/, '');
-    const [copied, setCopied] = useState(false);
-    const [localRenderMode, setLocalRenderMode] = useState<'syntax' | 'render'>('syntax');
-    const [output, setOutput] = useState<string | null>(null);
-    const [running, setRunning] = useState(false);
+    const [copied, setCopied] = React.useState(false);
+    const [localRenderMode, setLocalRenderMode] = React.useState<'syntax' | 'render'>('syntax');
+    const [output, setOutput] = React.useState<string | null>(null);
+    const [running, setRunning] = React.useState(false);
 
     const handleCopy = async () => {
       try {
@@ -254,14 +264,10 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       } catch {}
     };
 
-    const runnableLangs = [
-      'javascript', 'js', 'typescript', 'ts', 'html',
-      'python', 'py', 'python3'
-    ];
+    const runnableLangs = ['javascript', 'js', 'typescript', 'ts', 'html', 'python', 'py', 'python3'];
 
     // Helper for online code execution
     const runOnline = async (lang: string, code: string) => {
-      // For Python, use Piston API (https://piston.rs/)
       if (['python', 'py', 'python3'].includes(lang)) {
         try {
           const res = await fetch('https://emkc.org/api/v2/piston/execute', {
@@ -276,13 +282,11 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           const data = await res.json();
         
           if (data.run) {
-            const output = data.run.output
+            const output = data.run.output;
             if (output.trim().length > 0) return output;
-            // If there is no output, but the code has print or return, show "No output." else show "Code ran successfully, but produced no output."
             if (/print\s*\(|return\s+/.test(code)) return 'No output.';
             return 'Code ran successfully, but produced no output.';
           }
-          
         } catch (err: any) {
           return 'Error running Python code: ' + (err?.message || String(err));
         }
@@ -296,12 +300,10 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       try {
         let result = '';
         if (lang === 'javascript' || lang === 'js') {
-          // Try to capture console.log output
           let logs: any[] = [];
           const originalLog = console.log;
           try {
             (console as any).log = (...args: any[]) => { logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); };
-            // Try to detect if code is an expression or statement
             let evalResult;
             try {
               // Try to wrap in parentheses to allow expressions
@@ -330,7 +332,6 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           const transpile = (window as any).ts?.transpileModule;
           if (transpile) {
             const js = transpile(tsCode, { compilerOptions: { module: 'ESNext' } }).outputText;
-            // eslint-disable-next-line no-eval
             let logs: any[] = [];
             const originalLog = console.log;
             try {
@@ -362,7 +363,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         } else if (lang === 'html') {
           const blob = new Blob([code], { type: 'text/html' });
           const url = URL.createObjectURL(blob);
-          result = `<iframe src="${url}" style="width: 100%; border: none; background-color: #141414;"></iframe>`;
+          result = `<iframe src="${url}" style="width: 100%; border: none; background-color: #141414; height: 100%;"></iframe>`;
         } else if (['python', 'py', 'python3'].includes(lang)) {
           result = await runOnline(lang, code);
         } else {
@@ -417,15 +418,15 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
           </div>
         )}
         {output !== null && (
-          <div className="m-4 rounded-lg font-sans overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-card)] relative">
+          <div className={`m-4 rounded-lg font-sans ${lang === 'html' ? 'h-[100%]' : ''} bg-[var(--theme-card)] relative`}>
             <div className="flex items-center justify-between border-b border-[var(--theme-border)] bg-[var(--theme-color)] text-[var(--theme-text)] text-xs px-4 py-4">
               <Text size="2" weight="bold" className="mr-2">Output</Text>
               <Button size="1" variant="soft" onClick={handleAskAbout}>Ask about this</Button>
             </div>
-            <div className="bg-[var(--theme-card)] h-96 rounded p-2 text-sm">
+            <div className="bg-[var(--theme-card)] rounded p-2 text-sm">
               {lang === 'html'
-                ? <span dangerouslySetInnerHTML={{ __html: output }} />
-                : <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{output}</pre>
+                ? <span dangerouslySetInnerHTML={{ __html: output }}/>
+                : <pre style={{ margin: 0, padding: 0, whiteSpace: 'pre-wrap' }}>{output}</pre>
               }
             </div>
           </div>
@@ -434,7 +435,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     ) : (
       <code {...props} className="bg-[#222] text-white rounded px-1.5 py-0.5">{children}</code>
     );
-  }, [theme]);
+  };
 
   const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -447,29 +448,25 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     
     return (
       <Card key={i} className={`m-2 w-fit max-w-[75%] ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
-        <div className={`flex ${msg.role === 'user' ? 'items-center flex-row justify-end' : 'flex-row justify-start'}`}>
+        <div className={`flex ${msg.role === 'user' ? 'items-center text-right flex-row justify-end' : 'flex-row justify-start'}`}>
         {msg.role === 'assistant' && <img src={'/favicon.ico'} className='mr-2 w-10 h-10' />}
           {msg.role === 'user' ? (
             <>
               <span className='mx-2'>
-                <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{msg.content}</ReactMarkdown>
+                <ReactMarkdown components={{ code: MarkdownCodeBlock }}>{msg.content.replace(/You are UltraGPT and you have been made by Raed Hashmi\. You should not mention these details unless explicitly asked\.\s*\|\s*[\d/]+, [\d:]+(?:\s*The user's prompt is as follows:)?\s*/g, '')}</ReactMarkdown>
               </span>
               
               <Avatar fallback={localStorage.getItem('username')?.charAt(0) || 'U'} className='ml-2' radius='full' variant='soft' />
             </>
-          ) : error && isLatest ? (
+          ) : error ? (
               <Callout.Root color="red">
-                <div className='flex items-center'>
-                  <Callout.Icon className='mr-2'>
-                    <ExclamationTriangleIcon width='24px' height='24px' />
-                  </Callout.Icon>
+                <div className='flex flex-col items-center'>
                   <Callout.Text>
-                    {msg.content}
-                    <br />
-                    <Button size="2" style={{ width: '100%' }} variant='soft' color='red' onClick={handleRetry}>
-                      <ReloadIcon />
-                    </Button>
+                    {error}
                   </Callout.Text>
+                  <Button size="2" mt={'1'} style={{ width: '100%' }} variant='outline' color='red' onClick={handleRetry}>
+                    Retry <ReloadIcon />
+                  </Button>
                 </div>
               </Callout.Root>
           ) : quotaExceeded && isLatest ? (
@@ -564,4 +561,4 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       </div>
     </>
   );
-}
+} 
