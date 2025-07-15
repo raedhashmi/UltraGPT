@@ -13,7 +13,7 @@ export default function Navbar() {
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
-  const [ai_model, setAiModel] = useState('gpt-3.5-turbo')
+  const [ai_model, setAiModel] = useState<string>()
   const [username, setUsername] = useState<any>()
   const [password, setPassword] = useState<any>()
   const usernameRef = useRef<HTMLInputElement>(null)
@@ -220,15 +220,14 @@ export default function Navbar() {
                     <p className="text-sm text-var(--theme-border)">Pick the model you'd like to use for chat completion.</p>
                     <RadioGroup.Root value={ai_model} onValueChange={handleModelChange} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.7rem' }}>
                       {[
-                        ['gpt-3.5'],
-                        ['gpt-3.5-turbo'],
-                        ['gpt-3.5-turbo-0125'],
-                        ['gpt-3.5-turbo-1106'],
-                        ['gpt-3.5-turbo-16k'],
-                        ['gemini-pro'],
-                        ['gemini-1.5-pro'],
-                        ['gemini-ultra'],
+                        ['gemini-2.5-pro'],
+                        ['gemini-2.5-flash'],
+                        ['gemini-2.0-flash'],
+                        ['gemini-2.0-flash-lite'],
                         ['gemini-1.5-flash'],
+                        ['gemini-1.5-flash-8b'],
+                        ['gemini-1.5-pro'],
+                        ['aqa'],
                       ].map(([model]) => (
                         <RadioGroup.Item key={model} value={model} style={{ width: '100%' }} className={`items-center p-4 rounded-lg border transition cursor-pointer ${ai_model === model ? 'border-[var(--accent-a11)] bg-[var(--theme-card)] ring-1 ring-[var(--accent-a11)]' : 'border-[var(--theme-border)] bg-[var(--theme-card)] hover:border-[var(--accent-a11)]'}`}>
                           <div>

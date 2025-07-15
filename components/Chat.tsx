@@ -1,7 +1,6 @@
 'use client'
 
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import { v4 as uuidv4 } from 'uuid';
 import SignupCard from './SignupCard';
 import Suggestions from './Suggestions';
@@ -25,10 +24,9 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [uuid, setUuid] = useState<string | null>(null);
   const [noScroll, setNoScroll] = useState(true);
-  const [ai_model, setAiModel] = useState<string>('gemini-1.5-flash');
+  const [ai_model, setAiModel] = useState<string>('');
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [quotaTimer, setQuotaTimer] = useState<number>(0);
-  const [renderMode, setRenderMode] = useState<'syntax' | 'render'>('syntax');
   const isLatestAssistant = useCallback((index: number) => {
     return chatHistory[index]?.role === 'assistant' && index === chatHistory.length - 1;
   }, [chatHistory]);
@@ -124,9 +122,8 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     }
     localStorage.setItem('navbarStart', navbarStart);
     localStorage.setItem('navbarEnd', navbarEnd);
-    localStorage.setItem('ai_model', ai_model);
     document.documentElement.style.setProperty('--nav-gradient', `linear-gradient(to right, ${navbarStart}, ${navbarEnd})`);
-  }, [chatHistory, navbarStart, navbarEnd, ai_model, uuid]);
+  }, [chatHistory, navbarStart, navbarEnd, uuid]);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -174,7 +171,6 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     setChatHistory(prev => [...prev, { role: 'assistant', content: '' }]);
 
     try {
-      console.log('Sending request to Gemini API...');
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${ai_model}:generateContent?key=${geminiApiKey}`;
 
       const body = {
@@ -198,13 +194,16 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
 
       if (res.status === 429) {
         setQuotaExceeded(true);
-        setQuotaTimer(600);
+        setQuotaTimer(1800);
         localStorage.setItem('quota_exceeded_time', Date.now().toString());
         return;
-      }
-
-      if (res.status === 503) {
+      } else if (res.status === 503) {
         setError('The server is currently experiencing high traffic. Please try again later.');
+        setStreaming(false);
+        setLoading(false);
+        return;
+      } else if (res.status === 404) {
+        setError('The chat completion model is not valid. Please try again later.');
         setStreaming(false);
         setLoading(false);
         return;
@@ -212,12 +211,12 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
 
       const data = await res.json();
 
-      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text && res.status !== 429) {
+      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text && res.status !== 429 && res.status !== 503) {
         const assistantText = data.candidates[0].content.parts[0].text;
         setChatHistory(prev => {
           const updated = [...prev];
           const lastIndex = updated.findIndex(m => m.role === 'assistant' && m.content === '');
-          if (lastIndex !== -1) updated[lastIndex] = { role: 'assistant', content: assistantText };
+          if (lastIndex !== -1) { updated[lastIndex] = { role: 'assistant', content: '' }; setError(`${res.status === 404 ? 'The chat completion model is not valid. Please try again later.' : res.status === 503 ? 'The server is currently experiencing high traffic. Please try again later.' : res.status === 429 ? 'You have exceeded your quota. Please try again later.' : 'An error occurred'}`) };
           return updated;
         });
       }
@@ -232,15 +231,11 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       setChatHistory(prev => {
         const updated = [...prev];
         const lastIndex = updated.findIndex(m => m.role === 'assistant' && m.content === '');
-        if (lastIndex !== -1) updated[lastIndex] = { role: 'assistant', content: `Error: ${err instanceof Error ? err.message : 'An error occurred'}` };
+        if (lastIndex !== -1) updated[lastIndex] = { role: 'assistant', content: '' };
         return updated;
       });
     }
   }, [chatHistory, ai_model, geminiApiKey]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => { 
-    if (e.key === 'Enter' && !quotaExceeded) sendMessage(); 
-  }, [quotaExceeded, sendMessage]);
 
   const handleRetry = useCallback(() => {
     if (chatHistory.length >= 2) {
@@ -430,7 +425,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         </div>
         {lang === 'markdown' && localRenderMode === 'render' ? (
           <div className="p-4 bg-[var(--theme-card)]">
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
               {code}
             </ReactMarkdown>
           </div>
@@ -484,6 +479,14 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     ol: (props: any) => <ol {...props} className="list-decimal ml-6 my-1" />,
     li: (props: any) => <li {...props} className="my-0.5" />,
     p: (props: any) => <p {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnotes: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote_ref: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote_item: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote_item_label: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote_item_content: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    footnote_item_content_text: (props: any) => <div {...props} className="my-1 text-[var(--theme-text)]" />,
+    subscript: (props: any) => <sub {...props} className="my-1 text-[var(--theme-text)]" />,
   };
 
   const renderMessage = useCallback((msg: {role: 'user' | 'assistant', content: string}, i: number) => {
@@ -521,6 +524,22 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
                 <Callout.Text>
                   You have exceeded your current quota. Please wait {formatTime(quotaTimer)} before trying again.
                 </Callout.Text>
+              </div>
+            </Callout.Root>
+          ) : !quotaExceeded && isLatest ? (
+            <Callout.Root color="green">
+              <div className='flex items-center'>
+                <Callout.Icon className='mr-2'>
+                  <InfoCircledIcon width='24px' height='24px' />
+                </Callout.Icon>
+                <div className='flex flex-col items-center'>
+                  <Callout.Text>
+                    Your quota has been reset.
+                  </Callout.Text>
+                <Button size="2" mt={'1'} style={{ width: '100%' }} variant='outline' color='green' onClick={handleRetry}>
+                  Retry <ReloadIcon />
+                </Button>
+                </div>
               </div>
             </Callout.Root>
           ) : msg.role === 'assistant' ? (
