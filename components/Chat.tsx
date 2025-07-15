@@ -569,7 +569,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
       <div className={`p-4 w-full ${!noScroll ? "" : "absolute bottom-0"}`}>
         <div className="relative w-full">
           <textarea
-            className="w-full overflow-hidden rounded-lg border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-9 p-3 pr-12 text-base resize-y min-h-[48px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+            className="w-full overflow-hidden rounded-lg border border-[var(--theme-border)] bg-[var(--theme-bg)] pl-9 p-3 pr-12 text-base resize-y min-h-[48px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
             placeholder={quotaExceeded ? `Rate limited. Wait ${formatTime(quotaTimer)}...` : "Message anything..."}
             ref={promptRef as unknown as React.RefObject<HTMLTextAreaElement>}
             rows={1}
@@ -596,15 +596,15 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
               }
             }}
           />
-          <span className="absolute left-3 mt-4 text-gray-400 pointer-events-none">
+          <span className="absolute left-3 mt-4 text-[var(--theme-text)] pointer-events-none">
             {quotaExceeded ? <Cross1Icon /> : <ChatBubbleIcon />}
           </span>
-          <span className="absolute right-3 mt-4">
+          <span className="absolute right-3 mt-4 text-[var(--theme-text)]">
             <IconButton size="2" variant="ghost" onClick={() => sendMessage()} disabled={quotaExceeded || loading}>
               {loading ? (
                 <Spinner size="1" />
               ) : (
-                <PaperPlaneIcon width="24px" height="16px" />
+                <PaperPlaneIcon width="24px" color="var(--theme-text)" height="16px" />
               )}
             </IconButton>
           </span>
