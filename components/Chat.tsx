@@ -27,6 +27,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
   const [ai_model, setAiModel] = useState<string>('');
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [quotaTimer, setQuotaTimer] = useState<number>(0);
+  const [canRetry, setCanRetry] = useState(false);
   const isLatestAssistant = useCallback((index: number) => {
     return chatHistory[index]?.role === 'assistant' && index === chatHistory.length - 1;
   }, [chatHistory]);
@@ -69,6 +70,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         setQuotaTimer(Math.ceil(remainingTime / 1000));
       } else {
         localStorage.removeItem('quota_exceeded_time');
+        setCanRetry(true);
       }
     }
     
@@ -86,7 +88,6 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
     window.addEventListener('theme-updated', handleThemeChange);
-    
     handleScroll();
 
     return () => {
@@ -105,6 +106,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
             setQuotaExceeded(false);
             localStorage.removeItem('quota_exceeded_time');
             setError(null);
+            setCanRetry(true);
             return 0;
           }
           return prev - 1;
@@ -192,6 +194,8 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         body: JSON.stringify(body)
       });
 
+      console.log(res.status);
+
       if (res.status === 429) {
         setQuotaExceeded(true);
         setQuotaTimer(1800);
@@ -216,7 +220,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
         setChatHistory(prev => {
           const updated = [...prev];
           const lastIndex = updated.findIndex(m => m.role === 'assistant' && m.content === '');
-          if (lastIndex !== -1) { updated[lastIndex] = { role: 'assistant', content: '' }; setError(`${res.status === 404 ? 'The chat completion model is not valid. Please try again later.' : res.status === 503 ? 'The server is currently experiencing high traffic. Please try again later.' : res.status === 429 ? 'You have exceeded your quota. Please try again later.' : 'An error occurred'}`) };
+          if (lastIndex !== -1) { updated[lastIndex] = { role: 'assistant', content: assistantText };  };
           return updated;
         });
       }
@@ -526,7 +530,7 @@ export default function Chat({ geminiApiKey }: { geminiApiKey: string }) {
                 </Callout.Text>
               </div>
             </Callout.Root>
-          ) : !quotaExceeded && isLatest ? (
+          ) : !quotaExceeded && canRetry && isLatest ? (
             <Callout.Root color="green">
               <div className='flex items-center'>
                 <Callout.Icon className='mr-2'>
